@@ -11,14 +11,14 @@ const CATEGORIES: Category[] = [
   {
     id: 'cv', label: 'CV Templates', color: '#4a82f0', icon: FileText,
     resources: [
-      { title: '1-Page CV Template', description: 'Clean, concise single-page CV — ideal for internships and graduate roles.', pages: '1 page', fileUrl: 'https://www.keystonedigitalstrategy.co.uk/cv-1page.docx' },
-      { title: '2-Page CV Template', description: 'Extended format for candidates with more experience or academic projects.', pages: '2 pages', fileUrl: 'https://www.keystonedigitalstrategy.co.uk/cv-2page.docx' },
+      { title: '1-Page CV Template', description: 'Clean, concise single-page CV — ideal for internships and graduate roles.', pages: '1 page', fileUrl: 'https://bcusca.org/cv-1page.docx' },
+      { title: '2-Page CV Template', description: 'Extended format for candidates with more experience or academic projects.', pages: '2 pages', fileUrl: 'https://bcusca.org/cv-2page.docx' },
     ],
   },
   {
     id: 'cover-letter', label: 'Cover Letters', color: '#22c55e', icon: Mail,
     resources: [
-      { title: 'Cover Letter Template', description: 'Professional cover letter structure with guidance on what to include for tech roles.', fileUrl: 'https://www.keystonedigitalstrategy.co.uk/cover-letter.docx' },
+      { title: 'Cover Letter Template', description: 'Professional cover letter structure with guidance on what to include for tech roles.', fileUrl: 'https://bcusca.org/cover-letter.docx' },
     ],
   },
   {
