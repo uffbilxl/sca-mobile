@@ -10,6 +10,7 @@ import { typeColors, typeLabels } from '../lib/theme'
 import { OPPORTUNITIES } from '../lib/data'
 import type { OpportunityType } from '../lib/types'
 import AppHeader from '../components/AppHeader'
+import AnimatedBackground from '../components/AnimatedBackground'
 
 if (Platform.OS === 'android') {
   UIManager.setLayoutAnimationEnabledExperimental?.(true)
@@ -123,6 +124,7 @@ export default function OpportunitiesScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: c.bgPage }]}>
+      <AnimatedBackground />
       <AppHeader variant="screen" title="Opportunities" />
 
       {/* Search */}

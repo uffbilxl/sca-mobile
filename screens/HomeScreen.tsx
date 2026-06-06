@@ -7,6 +7,7 @@ import { useTheme } from '../lib/ThemeContext'
 import { OPPORTUNITIES } from '../lib/data'
 import TickerBanner from '../components/TickerBanner'
 import AppHeader from '../components/AppHeader'
+import AnimatedBackground from '../components/AnimatedBackground'
 
 const nd = Platform.OS !== 'web'
 
@@ -71,6 +72,7 @@ export default function HomeScreen() {
 
   return (
     <View style={[styles.outer, { backgroundColor: c.bgPage }]}>
+      <AnimatedBackground />
       <AppHeader variant="brand" />
       <ScrollView
         style={styles.scroll}

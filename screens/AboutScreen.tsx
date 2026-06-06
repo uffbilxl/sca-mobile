@@ -5,6 +5,7 @@ import { ArrowUpRight } from 'lucide-react-native'
 import { useTheme } from '../lib/ThemeContext'
 import { teal } from '../lib/theme'
 import AppHeader from '../components/AppHeader'
+import AnimatedBackground from '../components/AnimatedBackground'
 
 const values = [
   { title: 'Inclusive by design', text: 'The SCA is open to every BCU computing student, regardless of year, background, or experience level.' },
@@ -26,6 +27,7 @@ export default function AboutScreen() {
 
   return (
     <View style={[styles.outer, { backgroundColor: c.bgPage }]}>
+      <AnimatedBackground />
       <AppHeader variant="brand" />
       <ScrollView
         style={styles.scroll}

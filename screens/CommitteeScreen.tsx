@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Link2, ExternalLink } from 'lucide-react-native'
 import { useTheme } from '../lib/ThemeContext'
 import AppHeader from '../components/AppHeader'
+import AnimatedBackground from '../components/AnimatedBackground'
 
 interface Member { name: string; role: string; linkedin?: string; website?: string }
 interface Division { name: string; color: string; members: Member[] }
@@ -104,6 +105,7 @@ export default function CommitteeScreen() {
 
   return (
     <View style={[styles.outer, { backgroundColor: c.bgPage }]}>
+      <AnimatedBackground />
       <AppHeader variant="brand" />
       <ScrollView
         style={styles.scroll}

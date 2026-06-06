@@ -10,6 +10,7 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native'
 import { ThemeProvider, useTheme } from './lib/ThemeContext'
 import SplashScreen from './components/SplashScreen'
 import AppHeader from './components/AppHeader'
+import AnimatedBackground from './components/AnimatedBackground'
 
 import HomeScreen from './screens/HomeScreen'
 import OpportunitiesScreen from './screens/OpportunitiesScreen'
@@ -24,19 +25,20 @@ const MoreStack = createNativeStackNavigator()
 
 function withFade<P extends object>(Component: React.ComponentType<P>) {
   return function FadedScreen(props: P) {
-    const translateY = useRef(new Animated.Value(6)).current
+    const opacity = useRef(new Animated.Value(0.88)).current
     useFocusEffect(
       useCallback(() => {
-        translateY.setValue(6)
-        Animated.timing(translateY, {
-          toValue: 0,
-          duration: 220,
+        opacity.setValue(0.88)
+        Animated.timing(opacity, {
+          toValue: 1,
+          duration: 130,
           useNativeDriver: false,
+          isInteraction: false,
         }).start()
       }, [])
     )
     return (
-      <Animated.View style={{ flex: 1, transform: [{ translateY }] }}>
+      <Animated.View style={{ flex: 1, opacity }}>
         <Component {...(props as any)} />
       </Animated.View>
     )
@@ -63,6 +65,7 @@ function MoreHomeScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bgPage }}>
+      <AnimatedBackground />
       <AppHeader variant="brand" />
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 32, gap: 8 }} showsVerticalScrollIndicator={false}>
         {items.map(item => {
@@ -201,10 +204,10 @@ function ThemedApp() {
             tabBarLabelStyle: { fontSize: 10, fontFamily: 'Geist-Medium' } as any,
           })}
         >
-          <Tab.Screen name="Home" component={HomeScreen} options={{ title: 'Home' }} />
-          <Tab.Screen name="Opportunities" component={OpportunitiesScreen} />
-          <Tab.Screen name="Events" component={EventsScreen} />
-          <Tab.Screen name="SCA" component={SCAScreen} options={{ title: 'SCA Roles' }} />
+          <Tab.Screen name="Home" component={withFade(HomeScreen)} options={{ title: 'Home' }} />
+          <Tab.Screen name="Opportunities" component={withFade(OpportunitiesScreen)} />
+          <Tab.Screen name="Events" component={withFade(EventsScreen)} />
+          <Tab.Screen name="SCA" component={withFade(SCAScreen)} options={{ title: 'SCA Roles' }} />
           <Tab.Screen name="More" component={MoreStackNavigator} options={{ headerShown: false }} />
         </Tab.Navigator>
       </NavigationContainer>

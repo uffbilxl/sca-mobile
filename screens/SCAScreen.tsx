@@ -6,6 +6,7 @@ import { useTheme } from '../lib/ThemeContext'
 import type { SCAOpportunity } from '../lib/types'
 import OpportunityCard from '../components/OpportunityCard'
 import AppHeader from '../components/AppHeader'
+import AnimatedBackground from '../components/AnimatedBackground'
 
 export default function SCAScreen() {
   const insets = useSafeAreaInsets()
@@ -24,6 +25,7 @@ export default function SCAScreen() {
 
   return (
     <View style={[styles.outer, { backgroundColor: c.bgPage }]}>
+      <AnimatedBackground />
       <AppHeader variant="screen" title="SCA Roles" />
       <ScrollView
         style={styles.scroll}

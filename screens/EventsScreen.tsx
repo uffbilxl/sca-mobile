@@ -5,6 +5,7 @@ import { MapPin, Wifi, Clock, Calendar } from 'lucide-react-native'
 import { useTheme } from '../lib/ThemeContext'
 import type { SCAEvent } from '../lib/types'
 import AppHeader from '../components/AppHeader'
+import AnimatedBackground from '../components/AnimatedBackground'
 
 const nd = Platform.OS !== 'web'
 
@@ -85,6 +86,7 @@ export default function EventsScreen() {
 
   return (
     <View style={[styles.outer, { backgroundColor: c.bgPage }]}>
+      <AnimatedBackground />
       <AppHeader variant="screen" title="Events" />
       <ScrollView
         style={styles.scroll}

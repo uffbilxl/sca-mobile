@@ -3,6 +3,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { FileText, Mail, BookOpen, ArrowUpRight, ExternalLink } from 'lucide-react-native'
 import { useTheme } from '../lib/ThemeContext'
 import AppHeader from '../components/AppHeader'
+import AnimatedBackground from '../components/AnimatedBackground'
 
 interface Resource { title: string; description: string; fileUrl?: string; pages?: string }
 interface Category { id: string; label: string; color: string; icon: any; resources: Resource[] }
@@ -35,6 +36,7 @@ export default function ResourcesScreen() {
 
   return (
     <View style={[styles.outer, { backgroundColor: c.bgPage }]}>
+      <AnimatedBackground />
       <AppHeader variant="brand" />
       <ScrollView
         style={styles.scroll}
