@@ -175,8 +175,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.border1,
   },
-  eyebrow: { fontSize: 9, color: colors.accent, letterSpacing: 1.6, textTransform: 'uppercase', fontWeight: '700', marginBottom: 3 },
-  pageTitle: { fontSize: 22, fontWeight: '900', color: colors.t1, letterSpacing: -0.5 },
+  eyebrow: { fontSize: 9, color: colors.accent, letterSpacing: 1.6, textTransform: 'uppercase', fontFamily: 'Geist-Medium', marginBottom: 3 },
+  pageTitle: { fontSize: 22, fontFamily: 'Geist-Bold', color: colors.t1, letterSpacing: -0.5 },
 
   searchWrap: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 8 },
   searchInput: {
@@ -237,8 +237,8 @@ const styles = StyleSheet.create({
     borderColor: `${colors.t4}22`,
   },
   sponsoredText: { fontSize: 9, color: colors.t4, fontWeight: '600', letterSpacing: 0.4 },
-  cardTitle: { fontSize: 14, fontWeight: '700', color: colors.t1, lineHeight: 20 },
-  cardCompany: { fontSize: 12, color: colors.accent, fontWeight: '600' },
+  cardTitle: { fontSize: 14, fontFamily: 'Geist-SemiBold', color: colors.t1, lineHeight: 20 },
+  cardCompany: { fontSize: 12, color: colors.accent, fontFamily: 'Geist-Medium' },
   cardMeta: { flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' },
   cardMetaText: { fontSize: 11, color: colors.t3 },
   cardMetaDot: { fontSize: 11, color: colors.t4 },

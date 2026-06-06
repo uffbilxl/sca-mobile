@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
   content: { padding: 16, paddingBottom: 40, gap: 24 },
   pageHeader: { gap: 6 },
   eyebrow: { fontSize: 9, color: colors.accent, letterSpacing: 1.6, textTransform: 'uppercase', fontWeight: '700' },
-  pageTitle: { fontSize: 26, fontWeight: '900', color: colors.t1, letterSpacing: -0.6 },
+  pageTitle: { fontSize: 26, fontFamily: 'Geist-Bold', color: colors.t1, letterSpacing: -0.6 },
   pageSubtitle: { fontSize: 12, color: colors.t3, lineHeight: 18 },
 
   sectionBlock: { gap: 14 },
@@ -250,8 +250,8 @@ const styles = StyleSheet.create({
   avatarLg: { width: 44, height: 44, borderRadius: 12 },
   avatarText: { fontSize: 13, fontWeight: '800' },
   memberInfo: { flex: 1 },
-  memberName: { fontSize: 13, fontWeight: '700', color: colors.t1, lineHeight: 18 },
-  memberRole: { fontSize: 11, color: colors.t3 },
+  memberName: { fontSize: 13, fontFamily: 'Geist-SemiBold', color: colors.t1, lineHeight: 18 },
+  memberRole: { fontSize: 11, fontFamily: 'Geist-Regular', color: colors.t3 },
   memberLinks: { flexDirection: 'row', gap: 4 },
   linkBtn: {
     width: 28,

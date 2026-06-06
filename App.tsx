@@ -1,9 +1,12 @@
+import { useState } from 'react'
 import { NavigationContainer } from '@react-navigation/native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import { StatusBar, Text, View } from 'react-native'
+import { StatusBar, Text, View, TouchableOpacity, StyleSheet, ScrollView } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import { colors } from './lib/theme'
+import { useFonts } from 'expo-font'
+import { colors, fonts } from './lib/theme'
+import SplashScreen from './components/SplashScreen'
 
 import HomeScreen from './screens/HomeScreen'
 import OpportunitiesScreen from './screens/OpportunitiesScreen'
@@ -26,33 +29,13 @@ function TabIcon({ name, focused }: { name: string; focused: boolean }) {
   }
   return (
     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-      <Text style={{ fontSize: name === 'More' ? 10 : 16, color: focused ? colors.accent : colors.t4 }}>
+      <Text style={{ fontSize: name === 'More' ? 10 : 16, color: focused ? colors.accent : colors.t4, fontFamily: 'Geist-Regular' }}>
         {icons[name] ?? '●'}
       </Text>
     </View>
   )
 }
 
-function MoreStackNavigator() {
-  return (
-    <MoreStack.Navigator
-      screenOptions={{
-        headerStyle: { backgroundColor: colors.bg1 },
-        headerTintColor: colors.t1,
-        headerTitleStyle: { fontWeight: '700', fontSize: 17 },
-        headerShadowVisible: false,
-        contentStyle: { backgroundColor: colors.bg1 },
-      }}
-    >
-      <MoreStack.Screen name="MoreHome" component={MoreHomeScreen} options={{ title: 'More' }} />
-      <MoreStack.Screen name="Committee" component={CommitteeScreen} options={{ title: 'Committee' }} />
-      <MoreStack.Screen name="Resources" component={ResourcesScreen} options={{ title: 'Resources' }} />
-      <MoreStack.Screen name="About" component={AboutScreen} options={{ title: 'About' }} />
-    </MoreStack.Navigator>
-  )
-}
-
-import { TouchableOpacity, StyleSheet, ScrollView } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 
 function MoreHomeScreen() {
@@ -94,12 +77,43 @@ const moreStyles = StyleSheet.create({
     paddingVertical: 14,
     gap: 8,
   },
-  label: { fontSize: 14, fontWeight: '700', color: colors.t1, marginBottom: 2 },
-  desc: { fontSize: 11, color: colors.t4 },
+  label: { fontSize: 14, fontWeight: '700', color: colors.t1, marginBottom: 2, fontFamily: 'Geist-Bold' },
+  desc: { fontSize: 11, color: colors.t4, fontFamily: 'Geist-Regular' },
   arrow: { fontSize: 16, color: colors.t4 },
 })
 
+function MoreStackNavigator() {
+  return (
+    <MoreStack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: colors.bg1 },
+        headerTintColor: colors.t1,
+        headerTitleStyle: { fontWeight: '700', fontSize: 17, fontFamily: 'Geist-Bold' } as any,
+        headerShadowVisible: false,
+        contentStyle: { backgroundColor: colors.bg1 },
+      }}
+    >
+      <MoreStack.Screen name="MoreHome" component={MoreHomeScreen} options={{ title: 'More' }} />
+      <MoreStack.Screen name="Committee" component={CommitteeScreen} options={{ title: 'Committee' }} />
+      <MoreStack.Screen name="Resources" component={ResourcesScreen} options={{ title: 'Resources' }} />
+      <MoreStack.Screen name="About" component={AboutScreen} options={{ title: 'About' }} />
+    </MoreStack.Navigator>
+  )
+}
+
 export default function App() {
+  const [splashDone, setSplashDone] = useState(false)
+
+  const [fontsLoaded] = useFonts({
+    'Geist-Light':    require('./assets/fonts/Geist-Light.ttf'),
+    'Geist-Regular':  require('./assets/fonts/Geist-Regular.ttf'),
+    'Geist-Medium':   require('./assets/fonts/Geist-Medium.ttf'),
+    'Geist-SemiBold': require('./assets/fonts/Geist-SemiBold.ttf'),
+    'Geist-Bold':     require('./assets/fonts/Geist-Bold.ttf'),
+  })
+
+  if (!fontsLoaded) return null
+
   return (
     <SafeAreaProvider>
       <StatusBar barStyle="light-content" backgroundColor={colors.bg1} />
@@ -116,7 +130,7 @@ export default function App() {
             },
             tabBarActiveTintColor: colors.accent,
             tabBarInactiveTintColor: colors.t4,
-            tabBarLabelStyle: { fontSize: 10, fontWeight: '600' },
+            tabBarLabelStyle: { fontSize: 10, fontWeight: '600', fontFamily: 'Geist-Medium' } as any,
             headerShown: false,
           })}
         >
@@ -127,6 +141,10 @@ export default function App() {
           <Tab.Screen name="More" component={MoreStackNavigator} options={{ headerShown: false }} />
         </Tab.Navigator>
       </NavigationContainer>
+
+      {!splashDone && fontsLoaded && (
+        <SplashScreen onDone={() => setSplashDone(true)} />
+      )}
     </SafeAreaProvider>
   )
 }

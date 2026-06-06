@@ -1,22 +1,25 @@
 export const colors = {
-  bg1: '#090909',
-  bg2: '#111111',
-  bg3: '#181818',
-  bg4: '#202020',
-  border1: '#222222',
-  border2: '#2e2e2e',
-  border3: '#3a3a3a',
-  t1: '#f5f5f5',
-  t2: '#cccccc',
-  t3: '#999999',
-  t4: '#555555',
-  accent: '#5b8df5',
-  accentBg: 'rgba(91,141,245,0.12)',
-  accentBorder: 'rgba(91,141,245,0.28)',
+  bg1: '#0d1117',
+  bg2: '#161b22',
+  bg3: '#21262d',
+  bg4: '#2d333b',
+  border1: '#30363d',
+  border2: '#21262d',
+  border3: '#444c56',
+  t1: '#ffffff',
+  t2: '#e6edf3',
+  t3: '#8b949e',
+  t4: '#6e7681',
+  accent: '#4f8ef7',
+  accentBg: 'rgba(79,142,247,0.12)',
+  accentBorder: 'rgba(79,142,247,0.28)',
+  teal: '#3fb68b',
+  blueText: '#58a6ff',
+  navBg: '#161b22',
 }
 
 export const typeColors: Record<string, string> = {
-  INTERNSHIP: '#5b8df5',
+  INTERNSHIP: '#4f8ef7',
   PLACEMENT: '#22c55e',
   GRADUATE: '#a855f7',
   SPRING_WEEK: '#f59e0b',
@@ -34,5 +37,13 @@ export const typeLabels: Record<string, string> = {
 export const modeColors: Record<string, string> = {
   REMOTE: '#22c55e',
   HYBRID: '#f59e0b',
-  ONSITE: '#5b8df5',
+  ONSITE: '#4f8ef7',
+}
+
+export const fonts = {
+  light: 'Geist-Light',
+  regular: 'Geist-Regular',
+  medium: 'Geist-Medium',
+  semiBold: 'Geist-SemiBold',
+  bold: 'Geist-Bold',
 }

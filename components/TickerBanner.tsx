@@ -21,7 +21,7 @@ export default function TickerBanner() {
     const anim = Animated.loop(
       Animated.timing(translateX, {
         toValue: -halfWidth,
-        duration: halfWidth * 14,
+        duration: halfWidth * 16,
         useNativeDriver: true,
         easing: Easing.linear,
       })
@@ -38,7 +38,7 @@ export default function TickerBanner() {
       >
         {doubled.map((item, i) => (
           <View key={i} style={styles.item}>
-            <Text style={[styles.text, i % 2 === 0 ? styles.textAccent : styles.textMuted]}>
+            <Text style={[styles.text, i % 2 === 0 ? styles.textBlue : styles.textMuted]}>
               {item}
             </Text>
             <Text style={styles.sep}>·</Text>
@@ -53,14 +53,16 @@ const styles = StyleSheet.create({
   wrapper: {
     height: 34,
     overflow: 'hidden',
-    backgroundColor: colors.bg2,
+    backgroundColor: colors.bg1,
+    borderTopWidth: 1,
     borderBottomWidth: 1,
+    borderTopColor: colors.border1,
     borderBottomColor: colors.border1,
     justifyContent: 'center',
   },
   item: { flexDirection: 'row', alignItems: 'center', height: 34 },
-  text: { fontSize: 10, marginHorizontal: 12, letterSpacing: 0.7 },
-  textAccent: { color: `${colors.accent}75`, fontWeight: '600' },
-  textMuted: { color: colors.t4, fontWeight: '400' },
-  sep: { color: colors.border3, fontSize: 9 },
+  text: { fontSize: 10, marginHorizontal: 10, letterSpacing: 0.5, fontFamily: 'Geist-Regular' },
+  textBlue: { color: '#58a6ff' },
+  textMuted: { color: colors.t4 },
+  sep: { color: colors.border1, fontSize: 9 },
 })

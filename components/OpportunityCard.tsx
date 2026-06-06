@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accentBg,
     borderColor: colors.accentBorder,
   },
-  tagText: { fontSize: 10, color: colors.t3, fontWeight: '600', letterSpacing: 0.5 },
+  tagText: { fontSize: 10, color: colors.t3, fontFamily: 'Geist-Medium', letterSpacing: 0.5 },
   tagTextAccent: { color: colors.accent },
   pulse: {
     width: 6,
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     backgroundColor: colors.accent,
   },
-  title: { fontSize: 17, fontWeight: '700', color: colors.t1, letterSpacing: -0.3 },
+  title: { fontSize: 17, fontFamily: 'Geist-Bold', color: colors.t1, letterSpacing: -0.3 },
   subtitle: { fontSize: 12, color: colors.t3, marginTop: 2 },
   chevron: { fontSize: 11, color: colors.t4, marginTop: 4 },
   chevronOpen: { opacity: 0.6 },

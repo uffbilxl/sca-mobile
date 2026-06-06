@@ -59,8 +59,8 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.border1,
     gap: 4,
   },
-  eyebrow: { fontSize: 9, color: colors.accent, letterSpacing: 1.6, textTransform: 'uppercase', fontWeight: '700', marginBottom: 2 },
-  pageTitle: { fontSize: 28, fontWeight: '900', color: colors.t1, letterSpacing: -0.7 },
+  eyebrow: { fontSize: 9, color: colors.accent, letterSpacing: 1.6, textTransform: 'uppercase', fontFamily: 'Geist-Medium', marginBottom: 2 },
+  pageTitle: { fontSize: 28, fontFamily: 'Geist-Bold', color: colors.t1, letterSpacing: -0.7 },
   pageSubtitle: { fontSize: 13, color: colors.t3, lineHeight: 19 },
 
   empty: {

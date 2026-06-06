@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
 
   pageHeader: { gap: 8 },
   eyebrow: { fontSize: 9, color: colors.accent, letterSpacing: 1.6, textTransform: 'uppercase', fontWeight: '700' },
-  pageTitle: { fontSize: 28, fontWeight: '900', color: colors.t1, letterSpacing: -0.7, lineHeight: 34 },
+  pageTitle: { fontSize: 28, fontFamily: 'Geist-Bold', color: colors.t1, letterSpacing: -0.7, lineHeight: 34 },
   pageSubtitle: { fontSize: 14, color: colors.t3, lineHeight: 22 },
 
   missionBox: {
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
   missionGlowWrap: { position: 'absolute', top: -40, right: -40, width: 160, height: 160, overflow: 'hidden' },
   missionGlow: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, borderRadius: 999, backgroundColor: 'rgba(91,141,245,0.12)' },
   missionEyebrow: { fontSize: 9, color: colors.accent, letterSpacing: 1.6, textTransform: 'uppercase', fontWeight: '700' },
-  missionText: { fontSize: 15, fontWeight: '600', color: colors.t1, lineHeight: 24 },
+  missionText: { fontSize: 15, fontFamily: 'Geist-SemiBold', color: colors.t1, lineHeight: 24 },
 
   sectionBlock: { gap: 12 },
   sectionLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },

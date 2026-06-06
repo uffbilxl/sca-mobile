@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
 
   pageHeader: { gap: 4, paddingBottom: 4 },
   eyebrow: { fontSize: 9, color: colors.accent, letterSpacing: 1.6, textTransform: 'uppercase', fontWeight: '700', marginBottom: 2 },
-  pageTitle: { fontSize: 28, fontWeight: '900', color: colors.t1, letterSpacing: -0.7 },
+  pageTitle: { fontSize: 28, fontFamily: 'Geist-Bold', color: colors.t1, letterSpacing: -0.7 },
   pageSubtitle: { fontSize: 13, color: colors.t3, lineHeight: 19 },
 
   hero: {
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
 
   heroLive: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   heroLiveText: { fontSize: 10, color: colors.accent, fontWeight: '700', letterSpacing: 1.2, textTransform: 'uppercase' },
-  heroTitle: { fontSize: 20, fontWeight: '900', color: colors.t1, letterSpacing: -0.4, lineHeight: 26 },
+  heroTitle: { fontSize: 20, fontFamily: 'Geist-Bold', color: colors.t1, letterSpacing: -0.4, lineHeight: 26 },
   heroMeta: { fontSize: 12, color: colors.t3, lineHeight: 20 },
   countRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 6 },
   countUnit: { alignItems: 'center', gap: 4 },

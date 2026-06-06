@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
   content: { padding: 16, paddingBottom: 40, gap: 24 },
   pageHeader: { gap: 6 },
   eyebrow: { fontSize: 9, color: colors.accent, letterSpacing: 1.6, textTransform: 'uppercase', fontWeight: '700' },
-  pageTitle: { fontSize: 26, fontWeight: '900', color: colors.t1, letterSpacing: -0.6 },
+  pageTitle: { fontSize: 26, fontFamily: 'Geist-Bold', color: colors.t1, letterSpacing: -0.6 },
   pageSubtitle: { fontSize: 12, color: colors.t3, lineHeight: 18 },
 
   category: { gap: 12 },
