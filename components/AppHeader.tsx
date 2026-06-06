@@ -1,6 +1,7 @@
-import { View, Text, TouchableOpacity, StyleSheet, Linking, Platform } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet, Linking } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Sun, Moon, Search, SlidersHorizontal } from 'lucide-react-native'
+import { Sun, Moon, Search, SlidersHorizontal, ChevronLeft } from 'lucide-react-native'
+import { useNavigation } from '@react-navigation/native'
 import { useTheme } from '../lib/ThemeContext'
 
 interface AppHeaderProps {
@@ -13,6 +14,8 @@ interface AppHeaderProps {
 export default function AppHeader({ variant = 'brand', title, onSearchPress, onFilterPress }: AppHeaderProps) {
   const { colors: c, isDark, toggle } = useTheme()
   const insets = useSafeAreaInsets()
+  const navigation = useNavigation<any>()
+  const canGoBack = navigation.canGoBack()
 
   return (
     <View style={[
@@ -23,8 +26,18 @@ export default function AppHeader({ variant = 'brand', title, onSearchPress, onF
         paddingTop: insets.top + 8,
       },
     ]}>
-      {/* Left */}
-      {variant === 'brand' ? (
+      {/* Left — back button or brand/title */}
+      {canGoBack ? (
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backBtn}
+          accessibilityLabel="Go back"
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <ChevronLeft size={20} color={c.blue} strokeWidth={2.25} />
+          <Text style={[styles.backText, { color: c.blue }]}>Back</Text>
+        </TouchableOpacity>
+      ) : variant === 'brand' ? (
         <View style={styles.brand}>
           <View style={[styles.logoBox, { backgroundColor: '#0b1120' }]}>
             <Text style={styles.logoText}>S</Text>
@@ -37,7 +50,7 @@ export default function AppHeader({ variant = 'brand', title, onSearchPress, onF
 
       {/* Right */}
       <View style={styles.right}>
-        {variant === 'screen' && (
+        {variant === 'screen' && !canGoBack && (
           <>
             {onSearchPress && (
               <TouchableOpacity
@@ -71,7 +84,7 @@ export default function AppHeader({ variant = 'brand', title, onSearchPress, onF
           }
         </TouchableOpacity>
 
-        {variant === 'brand' && (
+        {variant === 'brand' && !canGoBack && (
           <TouchableOpacity
             style={[styles.joinPill, { backgroundColor: c.blue }]}
             onPress={() => Linking.openURL('https://www.linkedin.com/company/bcu-student-computing-association/')}
@@ -94,6 +107,18 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     borderBottomWidth: 1,
   },
+
+  backBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    paddingVertical: 4,
+  },
+  backText: {
+    fontSize: 15,
+    fontFamily: 'Geist-Medium',
+  },
+
   brand: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   logoBox: {
     width: 28,
