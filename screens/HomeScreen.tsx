@@ -251,12 +251,12 @@ const styles = StyleSheet.create({
   heroGlowTeal: {
     bottom: -220,
     left: -150,
-    backgroundColor: 'rgba(13,110,89,0.35)',
+    backgroundColor: 'rgba(13,110,89,0.07)',
   },
   heroGlowPurple: {
     bottom: -220,
     right: -150,
-    backgroundColor: 'rgba(88,28,135,0.40)',
+    backgroundColor: 'rgba(88,28,135,0.09)',
   },
 
   bcuPill: {
@@ -391,8 +391,8 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   ctaGlow: { position: 'absolute', width: 400, height: 400, borderRadius: 200 },
-  ctaGlowTeal: { bottom: -200, left: -100, backgroundColor: 'rgba(13,110,89,0.25)' },
-  ctaGlowPurple: { bottom: -200, right: -100, backgroundColor: 'rgba(88,28,135,0.30)' },
+  ctaGlowTeal: { bottom: -200, left: -100, backgroundColor: 'rgba(13,110,89,0.07)' },
+  ctaGlowPurple: { bottom: -200, right: -100, backgroundColor: 'rgba(88,28,135,0.09)' },
   ctaEyebrow: { fontSize: 9, color: colors.teal, letterSpacing: 1.6, textTransform: 'uppercase', fontFamily: 'Geist-Medium' },
   ctaTitle: { fontSize: 28, fontFamily: 'Geist-Bold', color: colors.t1, letterSpacing: -0.5 },
   ctaText: { fontSize: 13, fontFamily: 'Geist-Regular', color: colors.t3, lineHeight: 21, maxWidth: 320 },

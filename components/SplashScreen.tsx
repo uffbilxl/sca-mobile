@@ -145,12 +145,12 @@ const styles = StyleSheet.create({
   glowTeal: {
     bottom: -width * 0.5,
     left: -width * 0.4,
-    backgroundColor: 'rgba(13,110,89,0.35)',
+    backgroundColor: 'rgba(13,110,89,0.07)',
   },
   glowPurple: {
     bottom: -width * 0.5,
     right: -width * 0.4,
-    backgroundColor: 'rgba(88,28,135,0.4)',
+    backgroundColor: 'rgba(88,28,135,0.09)',
   },
 
   tickerContainer: {
