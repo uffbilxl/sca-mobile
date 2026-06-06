@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react'
 import { View, Text, ScrollView, StyleSheet, ActivityIndicator } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { subscribeToOpportunities, seedIfEmpty } from '../lib/firestore'
-import { colors } from '../lib/theme'
+import { useTheme } from '../lib/ThemeContext'
 import type { SCAOpportunity } from '../lib/types'
 import OpportunityCard from '../components/OpportunityCard'
+import AppHeader from '../components/AppHeader'
 
 export default function SCAScreen() {
   const insets = useSafeAreaInsets()
+  const { colors: c } = useTheme()
   const [opportunities, setOpportunities] = useState<SCAOpportunity[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -21,57 +23,53 @@ export default function SCAScreen() {
   }, [])
 
   return (
-    <ScrollView
-      style={styles.scroll}
-      contentContainerStyle={[styles.content, { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 32 }]}
-      showsVerticalScrollIndicator={false}
-    >
-      <View style={styles.pageHeader}>
-        <Text style={styles.eyebrow}>Internal</Text>
-        <Text style={styles.pageTitle}>SCA Opportunities</Text>
-        <Text style={styles.pageSubtitle}>
-          Committee roles, volunteering, and other ways to get involved with the Student Computing Association.
-        </Text>
-      </View>
-
-      {loading ? (
-        <ActivityIndicator color={colors.accent} style={{ marginTop: 40 }} />
-      ) : opportunities.length === 0 ? (
-        <View style={styles.empty}>
-          <Text style={styles.emptyTitle}>No roles right now</Text>
-          <Text style={styles.emptyText}>Check back soon — SCA positions are added throughout the year.</Text>
+    <View style={[styles.outer, { backgroundColor: c.bgPage }]}>
+      <AppHeader variant="screen" title="SCA Roles" />
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 32 }]}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={[styles.pageHeader, { borderBottomColor: c.border }]}>
+          <Text style={[styles.eyebrow, { color: c.blue }]}>Internal</Text>
+          <Text style={[styles.pageTitle, { color: c.textPrimary }]}>SCA Opportunities</Text>
+          <Text style={[styles.pageSubtitle, { color: c.textSecondary }]}>
+            Committee roles, volunteering, and other ways to get involved with the Student Computing Association.
+          </Text>
         </View>
-      ) : (
-        opportunities.map(opp => <OpportunityCard key={opp.id} opp={opp} />)
-      )}
-    </ScrollView>
+
+        {loading ? (
+          <ActivityIndicator color={c.blue} style={{ marginTop: 40 }} />
+        ) : opportunities.length === 0 ? (
+          <View style={[styles.empty, { backgroundColor: c.bgCard, borderColor: c.border }]}>
+            <Text style={[styles.emptyTitle, { color: c.textPrimary }]}>No roles right now</Text>
+            <Text style={[styles.emptyText, { color: c.textSecondary }]}>Check back soon — SCA positions are added throughout the year.</Text>
+          </View>
+        ) : (
+          opportunities.map(opp => <OpportunityCard key={opp.id} opp={opp} />)
+        )}
+      </ScrollView>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
-  scroll: { flex: 1, backgroundColor: colors.bg1 },
+  outer: { flex: 1 },
+  scroll: { flex: 1 },
   content: { paddingHorizontal: 16 },
 
   pageHeader: {
-    marginBottom: 20,
-    paddingBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border1,
-    gap: 4,
+    marginBottom: 20, paddingBottom: 20,
+    borderBottomWidth: 1, gap: 4, paddingTop: 16,
   },
-  eyebrow: { fontSize: 9, color: colors.accent, letterSpacing: 1.6, textTransform: 'uppercase', fontFamily: 'Geist-Medium', marginBottom: 2 },
-  pageTitle: { fontSize: 28, fontFamily: 'Geist-Bold', color: colors.t1, letterSpacing: -0.7 },
-  pageSubtitle: { fontSize: 13, color: colors.t3, lineHeight: 19 },
+  eyebrow: { fontSize: 9, letterSpacing: 1.6, textTransform: 'uppercase', fontWeight: '700' },
+  pageTitle: { fontSize: 26, fontFamily: 'Geist-Bold', letterSpacing: -0.6 },
+  pageSubtitle: { fontSize: 13, fontFamily: 'Geist-Regular', lineHeight: 19 },
 
   empty: {
-    backgroundColor: colors.bg2,
-    borderWidth: 1,
-    borderColor: colors.border1,
-    borderRadius: 14,
-    padding: 28,
-    alignItems: 'center',
-    gap: 8,
+    borderWidth: 1, borderRadius: 16, padding: 32,
+    alignItems: 'center', gap: 10, marginTop: 8,
   },
-  emptyTitle: { fontSize: 15, fontWeight: '700', color: colors.t2 },
-  emptyText: { fontSize: 13, color: colors.t3, textAlign: 'center', lineHeight: 19 },
+  emptyTitle: { fontSize: 16, fontFamily: 'Geist-SemiBold' },
+  emptyText: { fontSize: 13, fontFamily: 'Geist-Regular', textAlign: 'center', lineHeight: 20 },
 })

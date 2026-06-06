@@ -1,0 +1,299 @@
+# BCUSCA App — UI Design Prompt
+
+> Platforms: iOS (App Store) & Android (Google Play)
+> Font: Geist Sans throughout — no exceptions
+> This prompt governs every visual and interaction design decision in the app.
+
+---
+
+## The Problem to Fix
+
+The website (bcusca.org) renders well on desktop — its dark navy theme has atmosphere and space to breathe on a large screen. On a 6-inch phone screen, that same darkness becomes oppressive, hard to read, and feels amateur. Feedback confirmed this. The app must feel like a professional, polished product that students are proud to open. That means rethinking the UI entirely for mobile — while keeping the site's identity.
+
+---
+
+## 1. Theme System — Light Mode & Dark Mode
+
+The app ships with **both light and dark modes**. The user can toggle between them inside the app (Settings screen, or a sun/moon icon button in the header). The app also respects the device's system-level preference on first launch (`Appearance.getColorScheme()` on React Native / `UIUserInterfaceStyle` on iOS / `UiModeManager` on Android).
+
+**Light mode is the default.** It is the primary experience and must look exceptional. Dark mode is a carefully considered alternative — not just an inverted version.
+
+### Light mode tokens
+```
+--bg-page:       #f4f6f9    Page background — light blue-grey, never stark white
+--bg-card:       #ffffff    Cards, modals, sheets
+--bg-header:     #ffffff    Nav bar, tab bar, headers
+--bg-input:      #f1f5f9    Input fields, filter pills, icon backgrounds
+--border:        #e4e9f0    Card borders, dividers, separators
+--text-primary:  #0b1120    Main headings and body — deep navy, richer than black
+--text-secondary:#4a5568    Secondary body text
+--text-muted:    #8896aa    Labels, placeholders, metadata
+--blue:          #4a82f0    Primary action colour — buttons, active tabs, links
+--blue-light:    #edf2fe    Blue badge backgrounds, icon box tints
+--blue-text:     #3a6bcc    Blue badge text
+--green-bg:      #edfaf3    Graduate badge background
+--green-text:    #15803d    Graduate badge text
+--purple-bg:     #f5f0fe    Spring Week badge background
+--purple-text:   #6d28d9    Spring Week badge text
+```
+
+### Dark mode tokens
+```
+--bg-page:       #0b1120    Deep navy — not pure black
+--bg-card:       #111928    Card surfaces
+--bg-header:     #0f1827    Nav bar, tab bar
+--bg-input:      #1a2540    Input fields, icon backgrounds
+--border:        #1e2d45    Dividers and card borders
+--text-primary:  #f0f4ff    Headings
+--text-secondary:#8da0bc    Body text
+--text-muted:    #4a6080    Labels, placeholders
+--blue:          #4a82f0    Unchanged — same primary accent
+--blue-light:    #1a2d52    Badge backgrounds
+--blue-text:     #7baaf5    Badge text
+--green-bg:      #0d2a1a
+--green-text:    #4ade80
+--purple-bg:     #1e1040
+--purple-text:   #a78bfa
+```
+
+### Mode toggle — implementation
+- A sun/moon **icon button** (SVG, no emoji) sits in the app header, top-right alongside "Join SCA"
+- Tapping it toggles the mode with a 250ms crossfade transition on all colour tokens
+- The preference is persisted to `AsyncStorage` and restored on next launch
+- In React Native, wrap the entire app in a `ThemeProvider` context that passes the current token set down to every component
+- Splash screen is always dark — it does not participate in the theme toggle
+
+---
+
+## 2. No Emojis — Icon System
+
+**Zero emojis anywhere in the app.** Not in tab bars, not in quick-link cards, not in buttons, not anywhere. Emojis render inconsistently across devices, scale poorly, look unprofessional, and break the design language of a serious career tool.
+
+**Use SVG vector icons exclusively.** The recommended library is `@expo/vector-icons` (Feather set) or `lucide-react-native`. All icons must be:
+
+- Outline style (not filled) — consistent with modern iOS/Android app conventions
+- Sized at 20×20dp for tab bar icons, 18×18dp for inline icons, 16×16dp for badge/label icons
+- Coloured via the theme token, never hardcoded
+- Accompanied by a text label in tab bars (never icon-only)
+- Given an `accessibilityLabel` prop for screen readers
+
+### Icon mapping — use exactly these, no substitutions
+| Context | Icon name (Feather / Lucide) |
+|---|---|
+| Home tab | `home` |
+| Opportunities tab | `briefcase` |
+| Events tab | `calendar` |
+| Resources tab | `file-text` |
+| More tab | `more-horizontal` |
+| Search | `search` |
+| Filter | `sliders` |
+| Back navigation | `chevron-left` |
+| External link / Apply | `arrow-up-right` |
+| Location pin | `map-pin` |
+| Light mode toggle | `sun` |
+| Dark mode toggle | `moon` |
+| Committee / People | `users` |
+| SCA Opportunities | `star` |
+| About | `info` |
+| Report Issue | `alert-circle` |
+| LinkedIn | `linkedin` |
+
+---
+
+## 3. App-Wide Layout Rules
+
+### Page background
+- Light: `#f4f6f9` — a very subtle warm blue-grey, never pure white. This creates depth so white cards lift off the page.
+- Dark: `#0b1120` — deep but not oppressive navy.
+
+### Cards
+Every content item lives in a card. Cards must feel like physical surfaces:
+```
+background:    var(--bg-card)
+border:        1px solid var(--border)
+border-radius: 14px
+box-shadow:    0 1px 3px rgba(11,17,32,0.06), 0 4px 12px rgba(11,17,32,0.04)   [light]
+               0 1px 3px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.2)           [dark]
+padding:       14px
+```
+
+### Typography scale (Geist Sans)
+```
+Display:   22px / weight 800 / tracking -0.025em  — hero headings on dark card
+H1:        18px / weight 700 / tracking -0.015em  — screen titles
+H2:        14px / weight 700 / tracking -0.01em   — section headings
+H3:        12px / weight 600                       — card titles
+Body:      13px / weight 400 / line-height 1.65   — descriptions
+Small:     11px / weight 500                       — metadata, labels
+Micro:     10px / weight 500 / tracking 0.04em    — badges, tab labels, pill labels
+Uppercase: always paired with letter-spacing 0.08em and weight 600
+```
+
+### Spacing system (8pt grid)
+- Base unit: 8px
+- Card internal padding: 14px
+- Between cards in a list: 8px gap
+- Screen horizontal padding: 16px (the "gutter")
+- Section top padding: 20px
+- Section bottom padding: 12px
+
+### Touch targets
+- Minimum tappable area: 44×44pt (iOS HIG) / 48×48dp (Material 3)
+- Apply button inside cards: full width, 44pt height minimum
+
+---
+
+## 4. Screen-by-Screen UI Specification
+
+### 4.1 Splash screen (always dark — no theme toggle)
+- Background: `#0b1120`
+- Teal glow: `radial-gradient(ellipse at 15% 85%, rgba(13,110,89,0.48) 0%, transparent 70%)`
+- Purple glow: `radial-gradient(ellipse at 85% 80%, rgba(88,28,135,0.54) 0%, transparent 65%)`
+- SCA logo: centred, 64×64pt, scales in from 85% with fade
+- BCU pill: border `#21262d`, green dot `#3fb68b`, text `#8b949e`, Geist 400 6pt uppercase
+- Heading: "Student Computing Association" — Geist 700 15pt white
+- Tagline: italic, Geist Light 300, white at 42% opacity
+- Ambient ticker: company names at bottom, 7pt, white at 30% opacity
+- No buttons. No interaction. Auto-dismisses to Home at 3s.
+
+### 4.2 App header (all screens except splash)
+- Height: 52pt + safe area top
+- Left: SCA logo (22×22pt in dark rounded square) + "BCUSCA" wordmark (Geist 700, `var(--text-primary)`)
+- Right: theme toggle icon (sun/moon SVG) + "Join SCA" pill (blue filled)
+- Bottom border: 1px `var(--border)`
+- On Opportunities, Events, Resources screens: header shows screen title left-aligned instead of logo+wordmark, with search + filter icons right
+
+### 4.3 Home screen
+**Hero card** (the only dark element in the light-mode app):
+- Gradient: `linear-gradient(140deg, #0d1420 0%, #111928 55%, #16082a 100%)`
+- Teal + purple ambient glows (same as splash but subtler)
+- Border-radius: 18pt, margin: 8pt from screen edges
+- BCU pill, hero heading, subheading, two CTA buttons ("Explore Opportunities", "Upcoming Events")
+- Buttons: primary blue filled, secondary transparent with rgba white border — both Geist 700, no emojis in button text, arrow glyphs only using `→` unicode or `arrow-right` SVG
+
+**Company ticker strip:**
+- White/dark-card background, 1px borders top and bottom
+- Geist 500 7pt, muted colour — with highlighted companies (Microsoft, Quantinuum, etc.) in `var(--blue)` Geist 600
+- Infinite horizontal scroll, no interaction
+
+**Featured Opportunities section:**
+- "HANDPICKED" uppercase micro label above "Featured opportunities" H2
+- "View all →" right-aligned (no emoji, arrow glyph only)
+- Cards scroll horizontally, 3 visible with peek of 4th
+- Each card: company icon (initials in coloured rounded square — colour auto-assigned per company, consistent), "Featured" badge, company name, role title, tag pills, "Apply →" button
+
+**Quick links grid:**
+- 2×2 grid of cards
+- Each card: icon box (SVG icon in tinted square — briefcase/calendar/file-text/users), title, subtitle, right-arrow glyph
+- No emojis
+
+### 4.4 Opportunities screen
+- Header: "Opportunities" title + search icon + filter icon (both SVG, no emoji)
+- Filter pills row: "All" (active = blue filled), "Internship", "Placement", "Graduate", "Spring Week" — horizontal scroll, no wrapping
+- Vertical card list: full-width cards
+- Each card: company icon + name (left), Featured badge (right), role title, location (map-pin SVG + text), tag pills, Apply button
+- Location text format: "City · Work type" e.g. "London · Hybrid"
+- Deadline: shown as text below tags, muted colour
+
+### 4.5 Remaining screens
+- Events, SCA Opportunities, Committee, Resources, About
+- All use the same card system, typography, and colour tokens
+- No dark backgrounds except the hero card element where contextually appropriate
+
+### 4.6 Settings / More screen (behind "More" tab)
+- List of secondary nav items: SCA Opportunities, Committee, About, Report an Issue, Join the Committee
+- Theme toggle row: "Appearance" label, sun/moon toggle switch (right-aligned)
+- "App version" footer
+- All list items use chevron-right SVG, no emoji
+
+---
+
+## 5. Opportunity Badge System
+
+Role type badges are colour-coded for instant visual scanning. No emoji.
+
+| Role type | Background | Text colour |
+|---|---|---|
+| Internship | `var(--blue-light)` | `var(--blue-text)` |
+| Placement | `var(--blue-light)` | `var(--blue-text)` |
+| Graduate | `var(--green-bg)` | `var(--green-text)` |
+| Spring Week | `var(--purple-bg)` | `var(--purple-text)` |
+| Featured | `var(--blue-light)` | `var(--blue)` — weight 600 |
+
+Work type badges (Hybrid, On-site, Remote):
+- Background: `var(--bg-input)`
+- Text: `var(--text-secondary)`
+- Weight: 500
+
+Badge spec:
+```
+font-size:     10pt
+font-weight:   500–600
+padding:       3pt 7pt
+border-radius: 5pt
+```
+
+---
+
+## 6. Tab Bar
+
+- 5 tabs: Home, Opportunities, Events, Resources, More
+- Active tab: `var(--blue)` icon + label, weight 700
+- Inactive tab: `var(--text-muted)` icon + label, weight 500
+- Tab bar height: 56pt + safe area bottom inset
+- Tab label font: Geist 500, 10pt
+- iOS: use `UITabBarAppearance` configured programmatically, no default translucency
+- Android: `NavigationBar` component from React Navigation, `shifting: false`
+
+---
+
+## 7. Platform-Specific Behaviour
+
+### iOS
+- Large title navigation (collapses on scroll) for Opportunities and Events screens
+- `UIImpactFeedbackGenerator` (light) on card taps
+- `UIRefreshControl` on all scrollable lists
+- Sheet presentations (half-screen modal) for filter panels
+- Dynamic Island / notch safe area — no content overlap
+- `UIContextMenuInteraction` (long-press) on opportunity cards: "Apply", "Share", "Save"
+
+### Android
+- Material 3 ripple effect on all tappable surfaces
+- Edge-to-edge display: `WindowCompat.setDecorFitsSystemWindows(window, false)`
+- Bottom sheet for filter panel (`BottomSheetDialogFragment`)
+- Navigation bar colour matches tab bar background
+- Font loaded via bundled `.ttf` assets — do NOT use system font
+
+---
+
+## 8. Animations & Transitions
+
+- Screen transitions: native stack (slide) on iOS, fade + slight translate on Android
+- Card mount: stagger fade-up on list screens (100ms between cards, 200ms delay first card)
+- Theme toggle: 250ms crossfade on all colour tokens via `transition: background 0.25s, color 0.25s`
+- Hero card glow: subtle pulse animation, 4s period, 8% scale, CSS-only
+- Ticker: CSS `animation: scroll 22s linear infinite` — no JS
+- Splash logo: scale from 0.85 → 1.0 with fade, cubic-bezier(0.22, 1, 0.36, 1), 600ms
+- Tab switch: icon colour transition 150ms, no slide animation on content
+
+**No bounce animations, no excessive spring physics, no heavy transitions.** Subtle and purposeful only.
+
+---
+
+## 9. What Is Explicitly Forbidden
+
+The following must never appear anywhere in the app:
+
+- **Emojis** — not in buttons, tabs, cards, labels, placeholders, or anywhere else
+- **Stark pure-white (`#ffffff`) page backgrounds** — use `#f4f6f9` in light mode
+- **Full-screen dark backgrounds in light mode** — only the splash and hero card are dark
+- **Inconsistent border radii** — stick to 7pt (pills/badges), 12pt (small cards), 14pt (standard cards), 18pt (hero card), 36pt (phone shell)
+- **Underline-style links** — use colour alone (`var(--blue)`) to indicate links
+- **Placeholder lorem ipsum text** — all text must be real content from bcusca.org
+- **Generic icons** (clip-art style, filled where outline is expected)
+- **Hardcoded colours** — every colour must come from the token system so light/dark mode works correctly
+
+---
+
+*This prompt governs UI design only. For content, navigation structure, App Store submission, and splash screen details see the Master Development Prompt.*
+*Reference: bcusca.org · Font: Geist Sans · Icons: Feather / Lucide (SVG outline)*

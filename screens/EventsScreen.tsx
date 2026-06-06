@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Linking, Animated, Platform } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { colors } from '../lib/theme'
+import { MapPin, Wifi, Clock, Calendar } from 'lucide-react-native'
+import { useTheme } from '../lib/ThemeContext'
 import type { SCAEvent } from '../lib/types'
+import AppHeader from '../components/AppHeader'
 
 const nd = Platform.OS !== 'web'
 
@@ -23,11 +25,9 @@ const EVENTS: SCAEvent[] = [
 ]
 
 function pad(n: number) { return String(n).padStart(2, '0') }
-
 function formatDate(d: Date) {
   return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
 }
-
 function formatTime(d: Date) {
   return d.toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true })
 }
@@ -48,7 +48,7 @@ function useCountdown(target: Date | null) {
   }
 }
 
-function PulseDot() {
+function PulseDot({ color }: { color: string }) {
   const opacity = useRef(new Animated.Value(1)).current
   useEffect(() => {
     Animated.loop(
@@ -58,13 +58,13 @@ function PulseDot() {
       ])
     ).start()
   }, [])
-  return <Animated.View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: colors.accent, opacity }} />
+  return <Animated.View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: color, opacity }} />
 }
 
-function CountdownUnit({ value, label }: { value: number; label: string }) {
+function CountdownUnit({ value, label, c }: { value: number; label: string; c: any }) {
   return (
     <View style={styles.countUnit}>
-      <View style={styles.countBox}>
+      <View style={[styles.countBox, { backgroundColor: '#1a2540', borderColor: '#1e2d45' }]}>
         <Text style={styles.countNum}>{pad(value)}</Text>
       </View>
       <Text style={styles.countLabel}>{label}</Text>
@@ -74,6 +74,7 @@ function CountdownUnit({ value, label }: { value: number; label: string }) {
 
 export default function EventsScreen() {
   const insets = useSafeAreaInsets()
+  const { colors: c } = useTheme()
   const now = new Date()
   const upcoming = EVENTS.filter(e => e.date >= now).sort((a, b) => +a.date - +b.date)
   const past = EVENTS.filter(e => e.date < now).sort((a, b) => +b.date - +a.date)
@@ -83,218 +84,218 @@ export default function EventsScreen() {
   const countdown = useCountdown(nextEvent?.date ?? null)
 
   return (
-    <ScrollView
-      style={styles.scroll}
-      contentContainerStyle={[styles.content, { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 32 }]}
-      showsVerticalScrollIndicator={false}
-    >
-      {/* Page header */}
-      <View style={styles.pageHeader}>
-        <Text style={styles.eyebrow}>SCA</Text>
-        <Text style={styles.pageTitle}>Events</Text>
-        <Text style={styles.pageSubtitle}>Workshops, talks, networking and career events for BCU computing students.</Text>
-      </View>
-
-      {/* Countdown hero */}
-      {nextEvent && !countdown.over && (
-        <View style={styles.hero}>
-          {/* glow */}
-          <View pointerEvents="none" style={styles.heroGlowWrap}>
-            <View style={styles.heroGlow} />
-          </View>
-
-          <View style={styles.heroLive}>
-            <PulseDot />
-            <Text style={styles.heroLiveText}>Next Event</Text>
-          </View>
-          <Text style={styles.heroTitle}>{nextEvent.title}</Text>
-          <Text style={styles.heroMeta}>
-            {formatDate(nextEvent.date)}
-            {'\n'}
-            {formatTime(nextEvent.date)}{nextEvent.endDate ? ` – ${formatTime(nextEvent.endDate)}` : ''}
-            {'\n'}
-            {nextEvent.isOnline ? '⊕' : '◎'} {nextEvent.location}
-          </Text>
-          <View style={styles.countRow}>
-            <CountdownUnit value={countdown.days} label="Days" />
-            <Text style={styles.countSep}>:</Text>
-            <CountdownUnit value={countdown.hours} label="Hrs" />
-            <Text style={styles.countSep}>:</Text>
-            <CountdownUnit value={countdown.mins} label="Min" />
-            <Text style={styles.countSep}>:</Text>
-            <CountdownUnit value={countdown.secs} label="Sec" />
-          </View>
-          {nextEvent.registrationUrl ? (
-            <TouchableOpacity style={styles.registerBtn} onPress={() => Linking.openURL(nextEvent.registrationUrl!)} activeOpacity={0.85}>
-              <Text style={styles.registerBtnText}>Register now →</Text>
-            </TouchableOpacity>
-          ) : (
-            <View style={styles.openBadge}>
-              <Text style={styles.openBadgeText}>Open to all — no registration needed</Text>
+    <View style={[styles.outer, { backgroundColor: c.bgPage }]}>
+      <AppHeader variant="screen" title="Events" />
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 32 }]}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Countdown hero (always dark) */}
+        {nextEvent && !countdown.over && (
+          <View style={styles.hero}>
+            <View pointerEvents="none" style={styles.heroGlowWrap}>
+              <View style={styles.heroGlow} />
             </View>
-          )}
-        </View>
-      )}
-
-      {/* Tabs */}
-      <View style={styles.tabs}>
-        {(['upcoming', 'past'] as const).map(t => (
-          <TouchableOpacity
-            key={t}
-            style={[styles.tab, tab === t && styles.tabActive]}
-            onPress={() => setTab(t)}
-          >
-            <Text style={[styles.tabText, tab === t && styles.tabTextActive]}>
-              {t === 'upcoming' ? `Upcoming${upcoming.length ? ` (${upcoming.length})` : ''}` : 'Past'}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* Event list */}
-      {list.length === 0 ? (
-        <View style={styles.empty}>
-          <Text style={styles.emptyIcon}>◷</Text>
-          <Text style={styles.emptyTitle}>{tab === 'upcoming' ? 'Events coming soon' : 'No past events yet'}</Text>
-          <Text style={styles.emptyText}>
-            {tab === 'upcoming'
-              ? 'The SCA is busy planning workshops, talks, and networking events. Stay tuned.'
-              : 'Previous events will appear here once they have taken place.'}
-          </Text>
-        </View>
-      ) : (
-        <View style={styles.eventList}>
-          {list.map(event => {
-            const isPast = event.date < now
-            return (
-              <View key={event.id} style={[styles.eventCard, isPast && styles.eventCardPast]}>
-                <View style={[styles.dateBadge, isPast && styles.dateBadgePast]}>
-                  <Text style={[styles.dateMonth, isPast && styles.dateMuted]}>
-                    {event.date.toLocaleString('en-GB', { month: 'short' }).toUpperCase()}
-                  </Text>
-                  <Text style={[styles.dateDay, isPast && styles.dateDayPast]}>
-                    {event.date.getDate()}
-                  </Text>
-                  <Text style={[styles.dateWeekday, isPast && styles.dateMuted]}>
-                    {event.date.toLocaleString('en-GB', { weekday: 'short' }).toUpperCase()}
-                  </Text>
-                </View>
-                <View style={styles.eventInfo}>
-                  <Text style={styles.eventTitle}>{event.title}</Text>
-                  {event.description && <Text style={styles.eventDesc} numberOfLines={3}>{event.description}</Text>}
-                  <Text style={styles.eventMeta}>
-                    {event.isOnline ? '⊕' : '◎'} {event.location}  ◷ {formatTime(event.date)}{event.endDate ? ` – ${formatTime(event.endDate)}` : ''}
-                  </Text>
-                  {!isPast && !event.spots && !event.registrationUrl && (
-                    <View style={styles.openSmall}>
-                      <Text style={styles.openSmallText}>Open to all</Text>
-                    </View>
-                  )}
-                </View>
+            <View style={styles.heroLive}>
+              <PulseDot color="#4a82f0" />
+              <Text style={styles.heroLiveText}>Next Event</Text>
+            </View>
+            <Text style={styles.heroTitle}>{nextEvent.title}</Text>
+            <View style={{ gap: 4 }}>
+              <Text style={styles.heroMeta}>{formatDate(nextEvent.date)}</Text>
+              <Text style={styles.heroMeta}>
+                {formatTime(nextEvent.date)}{nextEvent.endDate ? ` – ${formatTime(nextEvent.endDate)}` : ''}
+              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+                {nextEvent.isOnline
+                  ? <Wifi size={12} color="#8da0bc" strokeWidth={1.75} />
+                  : <MapPin size={12} color="#8da0bc" strokeWidth={1.75} />
+                }
+                <Text style={styles.heroMeta}>{nextEvent.location}</Text>
               </View>
-            )
-          })}
+            </View>
+            <View style={styles.countRow}>
+              <CountdownUnit value={countdown.days} label="Days" c={c} />
+              <Text style={styles.countSep}>:</Text>
+              <CountdownUnit value={countdown.hours} label="Hrs" c={c} />
+              <Text style={styles.countSep}>:</Text>
+              <CountdownUnit value={countdown.mins} label="Min" c={c} />
+              <Text style={styles.countSep}>:</Text>
+              <CountdownUnit value={countdown.secs} label="Sec" c={c} />
+            </View>
+            {nextEvent.registrationUrl ? (
+              <TouchableOpacity style={styles.registerBtn} onPress={() => Linking.openURL(nextEvent.registrationUrl!)} activeOpacity={0.85}>
+                <Text style={styles.registerBtnText}>Register now →</Text>
+              </TouchableOpacity>
+            ) : (
+              <View style={styles.openBadge}>
+                <Text style={styles.openBadgeText}>Open to all — no registration needed</Text>
+              </View>
+            )}
+          </View>
+        )}
+
+        {/* Tabs */}
+        <View style={[styles.tabs, { backgroundColor: c.bgInput }]}>
+          {(['upcoming', 'past'] as const).map(t => (
+            <TouchableOpacity
+              key={t}
+              style={[styles.tab, tab === t && [styles.tabActive, { backgroundColor: c.blue }]]}
+              onPress={() => setTab(t)}
+            >
+              <Text style={[styles.tabText, { color: tab === t ? '#fff' : c.textMuted }, tab === t && styles.tabTextActive]}>
+                {t === 'upcoming' ? `Upcoming${upcoming.length ? ` (${upcoming.length})` : ''}` : 'Past'}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
-      )}
-    </ScrollView>
+
+        {/* Event list */}
+        {list.length === 0 ? (
+          <View style={[styles.empty, { backgroundColor: c.bgCard, borderColor: c.border }]}>
+            <Calendar size={28} color={c.textMuted} strokeWidth={1.5} />
+            <Text style={[styles.emptyTitle, { color: c.textPrimary }]}>{tab === 'upcoming' ? 'Events coming soon' : 'No past events yet'}</Text>
+            <Text style={[styles.emptyText, { color: c.textSecondary }]}>
+              {tab === 'upcoming'
+                ? 'The SCA is busy planning workshops, talks, and networking events. Stay tuned.'
+                : 'Previous events will appear here once they have taken place.'}
+            </Text>
+          </View>
+        ) : (
+          <View style={styles.eventList}>
+            {list.map(event => {
+              const isPast = event.date < now
+              return (
+                <View key={event.id} style={[
+                  styles.eventCard,
+                  { backgroundColor: c.bgCard, borderColor: c.border },
+                  isPast && { opacity: 0.55 },
+                ]}>
+                  <View style={[
+                    styles.dateBadge,
+                    { backgroundColor: isPast ? c.bgInput : c.blueLight, borderColor: isPast ? c.border : `${c.blue}25` },
+                  ]}>
+                    <Text style={[styles.dateMonth, { color: isPast ? c.textMuted : `${c.blue}80` }]}>
+                      {event.date.toLocaleString('en-GB', { month: 'short' }).toUpperCase()}
+                    </Text>
+                    <Text style={[styles.dateDay, { color: isPast ? c.textSecondary : c.blue }]}>
+                      {event.date.getDate()}
+                    </Text>
+                    <Text style={[styles.dateWeekday, { color: isPast ? c.textMuted : `${c.blue}60` }]}>
+                      {event.date.toLocaleString('en-GB', { weekday: 'short' }).toUpperCase()}
+                    </Text>
+                  </View>
+                  <View style={styles.eventInfo}>
+                    <Text style={[styles.eventTitle, { color: c.textPrimary }]}>{event.title}</Text>
+                    {event.description && (
+                      <Text style={[styles.eventDesc, { color: c.textSecondary }]} numberOfLines={3}>{event.description}</Text>
+                    )}
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                        {event.isOnline
+                          ? <Wifi size={11} color={c.textMuted} strokeWidth={1.75} />
+                          : <MapPin size={11} color={c.textMuted} strokeWidth={1.75} />
+                        }
+                        <Text style={[styles.eventMeta, { color: c.textMuted }]}>{event.location}</Text>
+                      </View>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                        <Clock size={11} color={c.textMuted} strokeWidth={1.75} />
+                        <Text style={[styles.eventMeta, { color: c.textMuted }]}>
+                          {formatTime(event.date)}{event.endDate ? ` – ${formatTime(event.endDate)}` : ''}
+                        </Text>
+                      </View>
+                    </View>
+                    {!isPast && !event.spots && !event.registrationUrl && (
+                      <View style={[styles.openSmall, { borderColor: c.border }]}>
+                        <Text style={[styles.openSmallText, { color: c.textSecondary }]}>Open to all</Text>
+                      </View>
+                    )}
+                  </View>
+                </View>
+              )
+            })}
+          </View>
+        )}
+      </ScrollView>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
-  scroll: { flex: 1, backgroundColor: colors.bg1 },
-  content: { paddingHorizontal: 16, gap: 16 },
+  outer: { flex: 1 },
+  scroll: { flex: 1 },
+  content: { paddingHorizontal: 16, gap: 14, paddingTop: 14 },
 
-  pageHeader: { gap: 4, paddingBottom: 4 },
-  eyebrow: { fontSize: 9, color: colors.accent, letterSpacing: 1.6, textTransform: 'uppercase', fontWeight: '700', marginBottom: 2 },
-  pageTitle: { fontSize: 28, fontFamily: 'Geist-Bold', color: colors.t1, letterSpacing: -0.7 },
-  pageSubtitle: { fontSize: 13, color: colors.t3, lineHeight: 19 },
-
+  /* Hero (always dark) */
   hero: {
     backgroundColor: '#0d1422',
     borderWidth: 1,
-    borderColor: `${colors.accent}28`,
+    borderColor: 'rgba(74,130,240,0.2)',
     borderRadius: 16,
     padding: 20,
     gap: 14,
     overflow: 'hidden',
   },
   heroGlowWrap: { position: 'absolute', top: -60, right: -60, width: 200, height: 200, overflow: 'hidden' },
-  heroGlow: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, borderRadius: 999, backgroundColor: 'rgba(91,141,245,0.12)' },
-
+  heroGlow: { position: 'absolute', inset: 0, borderRadius: 999, backgroundColor: 'rgba(74,130,240,0.10)' } as any,
   heroLive: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  heroLiveText: { fontSize: 10, color: colors.accent, fontWeight: '700', letterSpacing: 1.2, textTransform: 'uppercase' },
-  heroTitle: { fontSize: 20, fontFamily: 'Geist-Bold', color: colors.t1, letterSpacing: -0.4, lineHeight: 26 },
-  heroMeta: { fontSize: 12, color: colors.t3, lineHeight: 20 },
+  heroLiveText: { fontSize: 10, color: '#4a82f0', fontWeight: '700', letterSpacing: 1.2, textTransform: 'uppercase' },
+  heroTitle: { fontSize: 20, fontFamily: 'Geist-Bold', color: '#f0f4ff', letterSpacing: -0.4, lineHeight: 26 },
+  heroMeta: { fontSize: 12, color: '#8da0bc', lineHeight: 18 },
   countRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 6 },
   countUnit: { alignItems: 'center', gap: 4 },
-  countBox: {
-    width: 54, height: 52, borderRadius: 10,
-    backgroundColor: colors.bg3, borderWidth: 1, borderColor: colors.border2,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  countNum: { fontSize: 22, fontWeight: '900', color: colors.t1 },
-  countLabel: { fontSize: 8, fontWeight: '700', color: colors.t4, letterSpacing: 1, textTransform: 'uppercase' },
-  countSep: { fontSize: 18, fontWeight: '900', color: colors.border2, marginBottom: 18 },
-
+  countBox: { width: 54, height: 52, borderRadius: 10, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  countNum: { fontSize: 22, fontWeight: '900', color: '#f0f4ff' },
+  countLabel: { fontSize: 8, fontWeight: '700', color: '#4a6080', letterSpacing: 1, textTransform: 'uppercase' },
+  countSep: { fontSize: 18, fontWeight: '900', color: '#1e2d45', marginBottom: 18 },
   openBadge: {
-    borderWidth: 1, borderColor: colors.border2, borderRadius: 8,
+    borderWidth: 1, borderColor: '#1e2d45', borderRadius: 8,
     paddingHorizontal: 12, paddingVertical: 8, alignSelf: 'flex-start',
   },
-  openBadgeText: { fontSize: 12, color: colors.t3, fontWeight: '500' },
+  openBadgeText: { fontSize: 12, color: '#8da0bc', fontWeight: '500' },
   registerBtn: {
-    backgroundColor: colors.accent, paddingHorizontal: 18, paddingVertical: 10,
+    backgroundColor: '#4a82f0', paddingHorizontal: 18, paddingVertical: 10,
     borderRadius: 10, alignSelf: 'flex-start',
   },
   registerBtnText: { color: '#fff', fontSize: 13, fontWeight: '700' },
 
   tabs: {
-    flexDirection: 'row',
-    backgroundColor: colors.bg2,
-    borderWidth: 1,
-    borderColor: colors.border1,
-    borderRadius: 10,
-    padding: 4,
-    alignSelf: 'flex-start',
-    gap: 2,
+    flexDirection: 'row', borderRadius: 10, padding: 4, alignSelf: 'flex-start', gap: 2,
   },
   tab: { paddingHorizontal: 16, paddingVertical: 7, borderRadius: 7 },
-  tabActive: { backgroundColor: colors.accent },
-  tabText: { fontSize: 12, color: colors.t3, fontWeight: '500' },
-  tabTextActive: { color: '#fff', fontWeight: '700' },
+  tabActive: {},
+  tabText: { fontSize: 12, fontFamily: 'Geist-Medium' },
+  tabTextActive: { fontFamily: 'Geist-SemiBold' },
 
   empty: {
-    backgroundColor: colors.bg2, borderWidth: 1, borderColor: colors.border1,
-    borderRadius: 16, padding: 32, alignItems: 'center', gap: 10,
+    borderWidth: 1, borderRadius: 16, padding: 32,
+    alignItems: 'center', gap: 10,
   },
-  emptyIcon: { fontSize: 28, marginBottom: 4 },
-  emptyTitle: { fontSize: 16, fontWeight: '700', color: colors.t1 },
-  emptyText: { fontSize: 13, color: colors.t3, textAlign: 'center', lineHeight: 20 },
+  emptyTitle: { fontSize: 16, fontFamily: 'Geist-SemiBold' },
+  emptyText: { fontSize: 13, fontFamily: 'Geist-Regular', textAlign: 'center', lineHeight: 20 },
 
   eventList: { gap: 8 },
   eventCard: {
-    flexDirection: 'row', backgroundColor: colors.bg2,
-    borderWidth: 1, borderColor: colors.border1,
+    flexDirection: 'row', borderWidth: 1,
     borderRadius: 14, padding: 14, gap: 12,
+    shadowColor: '#0b1120', shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04, shadowRadius: 4, elevation: 1,
   },
-  eventCardPast: { opacity: 0.55 },
   dateBadge: {
     width: 54, height: 62, borderRadius: 10,
-    backgroundColor: colors.accentBg, borderWidth: 1, borderColor: colors.accentBorder,
-    alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+    borderWidth: 1, alignItems: 'center', justifyContent: 'center', flexShrink: 0,
   },
-  dateBadgePast: { backgroundColor: colors.bg3, borderColor: colors.border1 },
-  dateMonth: { fontSize: 9, fontWeight: '700', letterSpacing: 0.8, color: `${colors.accent}80` },
-  dateDay: { fontSize: 26, fontWeight: '900', color: colors.accent, lineHeight: 30 },
-  dateDayPast: { color: colors.t3 },
-  dateWeekday: { fontSize: 9, fontWeight: '600', letterSpacing: 0.6, color: `${colors.accent}60` },
-  dateMuted: { color: colors.t4 },
+  dateMonth: { fontSize: 9, fontWeight: '700', letterSpacing: 0.8 },
+  dateDay: { fontSize: 26, fontWeight: '900', lineHeight: 30 },
+  dateWeekday: { fontSize: 9, fontWeight: '600', letterSpacing: 0.6 },
   eventInfo: { flex: 1, gap: 4 },
-  eventTitle: { fontSize: 15, fontWeight: '800', color: colors.t1, lineHeight: 20 },
-  eventDesc: { fontSize: 12, color: colors.t3, lineHeight: 17 },
-  eventMeta: { fontSize: 11, color: colors.t4 },
+  eventTitle: { fontSize: 15, fontFamily: 'Geist-SemiBold', lineHeight: 20 },
+  eventDesc: { fontSize: 12, fontFamily: 'Geist-Regular', lineHeight: 17 },
+  eventMeta: { fontSize: 11, fontFamily: 'Geist-Regular' },
   openSmall: {
-    alignSelf: 'flex-start', borderWidth: 1, borderColor: colors.border2,
+    alignSelf: 'flex-start', borderWidth: 1,
     borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, marginTop: 2,
   },
-  openSmallText: { fontSize: 10, color: colors.t3, fontWeight: '500' },
+  openSmallText: { fontSize: 10, fontFamily: 'Geist-Medium' },
 })

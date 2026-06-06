@@ -114,12 +114,12 @@ export default function SplashScreen({ onDone }: Props) {
   return (
     <Animated.View style={[styles.container, { opacity: screenOpacity }]}>
       {/* Teal glow — bottom left */}
-      <View pointerEvents="none" style={[styles.glowBase, styles.glowTeal]} />
+      <View style={[{ pointerEvents: 'none' } as any, styles.glowBase, styles.glowTeal]} />
       {/* Purple glow — bottom right */}
-      <View pointerEvents="none" style={[styles.glowBase, styles.glowPurple]} />
+      <View style={[{ pointerEvents: 'none' } as any, styles.glowBase, styles.glowPurple]} />
 
       {/* Ticker at bottom */}
-      <View style={styles.tickerContainer} pointerEvents="none">
+      <View style={[styles.tickerContainer, { pointerEvents: 'none' } as any]}>
         <TickerText />
       </View>
 

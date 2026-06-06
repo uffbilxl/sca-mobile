@@ -4,9 +4,12 @@ import {
   LayoutAnimation, Platform, UIManager,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { colors, typeColors, typeLabels, modeColors } from '../lib/theme'
+import { MapPin, ChevronDown, ChevronUp } from 'lucide-react-native'
+import { useTheme } from '../lib/ThemeContext'
+import { typeColors, typeLabels } from '../lib/theme'
 import { OPPORTUNITIES } from '../lib/data'
 import type { OpportunityType } from '../lib/types'
+import AppHeader from '../components/AppHeader'
 
 if (Platform.OS === 'android') {
   UIManager.setLayoutAnimationEnabledExperimental?.(true)
@@ -21,10 +24,11 @@ const TYPE_FILTERS: { label: string; value: OpportunityType | 'ALL' }[] = [
   { label: 'Insight', value: 'INSIGHT' },
 ]
 
-function OppCard({ opp }: { opp: typeof OPPORTUNITIES[0] }) {
+function OppCard({ opp, c }: { opp: typeof OPPORTUNITIES[0]; c: any }) {
   const [open, setOpen] = useState(false)
-  const tColor = typeColors[opp.type] ?? colors.accent
-  const mColor = modeColors[opp.workMode] ?? colors.t4
+  const tInfo = typeColors[opp.type]
+  const badgeBg   = tInfo ? c[tInfo.bg]   : c.blueLight
+  const badgeText = tInfo ? c[tInfo.text]  : c.blueText
 
   function toggle() {
     LayoutAnimation.configureNext({
@@ -37,42 +41,52 @@ function OppCard({ opp }: { opp: typeof OPPORTUNITIES[0] }) {
   }
 
   return (
-    <View style={[styles.card, open && { borderColor: `${tColor}35` }]}>
+    <View style={[
+      styles.card,
+      { backgroundColor: c.bgCard, borderColor: open ? `${c.blue}40` : c.border },
+      c.isDark
+        ? { shadowColor: '#000', shadowOpacity: 0.25 }
+        : { shadowColor: '#0b1120', shadowOpacity: 0.05 },
+    ]}>
       <TouchableOpacity onPress={toggle} activeOpacity={0.75} style={styles.cardHeader}>
         <View style={styles.cardLeft}>
           <View style={styles.cardTopRow}>
-            <View style={[styles.typeBadge, { backgroundColor: `${tColor}15`, borderColor: `${tColor}35` }]}>
-              <Text style={[styles.typeBadgeText, { color: tColor }]}>{typeLabels[opp.type]}</Text>
+            <View style={[styles.typeBadge, { backgroundColor: badgeBg }]}>
+              <Text style={[styles.typeBadgeText, { color: badgeText }]}>{typeLabels[opp.type]}</Text>
             </View>
             {opp.sponsored && (
-              <View style={styles.sponsoredBadge}>
-                <Text style={styles.sponsoredText}>Sponsored</Text>
+              <View style={[styles.sponsoredBadge, { backgroundColor: c.bgInput, borderColor: c.border }]}>
+                <Text style={[styles.sponsoredText, { color: c.textMuted }]}>Sponsored</Text>
               </View>
             )}
           </View>
-          <Text style={styles.cardTitle} numberOfLines={open ? undefined : 2}>{opp.title}</Text>
-          <Text style={styles.cardCompany}>{opp.company.name}</Text>
+          <Text style={[styles.cardTitle, { color: c.textPrimary }]} numberOfLines={open ? undefined : 2}>{opp.title}</Text>
+          <Text style={[styles.cardCompany, { color: c.blue }]}>{opp.company.name}</Text>
           <View style={styles.cardMeta}>
-            <Text style={styles.cardMetaText}>{opp.location}</Text>
-            <Text style={styles.cardMetaDot}>·</Text>
-            <View style={[styles.modeChip, { backgroundColor: `${mColor}18` }]}>
-              <Text style={[styles.modeChipText, { color: mColor }]}>{opp.workMode}</Text>
+            <MapPin size={11} color={c.textMuted} strokeWidth={1.75} />
+            <Text style={[styles.cardMetaText, { color: c.textSecondary }]}>{opp.location}</Text>
+            <Text style={[styles.cardMetaDot, { color: c.border }]}>·</Text>
+            <View style={[styles.modeChip, { backgroundColor: c.bgInput }]}>
+              <Text style={[styles.modeChipText, { color: c.textSecondary }]}>{opp.workMode}</Text>
             </View>
           </View>
         </View>
-        <Text style={styles.chevron}>{open ? '▲' : '▼'}</Text>
+        {open
+          ? <ChevronUp size={16} color={c.textMuted} strokeWidth={2} />
+          : <ChevronDown size={16} color={c.textMuted} strokeWidth={2} />
+        }
       </TouchableOpacity>
 
       {open && (
         <View style={styles.cardBody}>
-          <View style={styles.divider} />
-          <Text style={styles.description}>{opp.description}</Text>
+          <View style={[styles.divider, { backgroundColor: c.border }]} />
+          <Text style={[styles.description, { color: c.textSecondary }]}>{opp.description}</Text>
           {opp.startDate && (
-            <Text style={styles.metaLine}>Start: {opp.startDate}</Text>
+            <Text style={[styles.metaLine, { color: c.textMuted }]}>Start: {opp.startDate}</Text>
           )}
           {opp.applyUrl && (
             <TouchableOpacity
-              style={[styles.applyBtn, { backgroundColor: tColor }]}
+              style={[styles.applyBtn, { backgroundColor: c.blue }]}
               onPress={() => Linking.openURL(opp.applyUrl!)}
               activeOpacity={0.85}
             >
@@ -87,6 +101,7 @@ function OppCard({ opp }: { opp: typeof OPPORTUNITIES[0] }) {
 
 export default function OpportunitiesScreen() {
   const insets = useSafeAreaInsets()
+  const { colors: c } = useTheme()
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState<OpportunityType | 'ALL'>('ALL')
 
@@ -107,19 +122,15 @@ export default function OpportunitiesScreen() {
   }, [search, typeFilter])
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      {/* Header */}
-      <View style={styles.pageHeader}>
-        <Text style={styles.eyebrow}>BCU Computing</Text>
-        <Text style={styles.pageTitle}>Opportunities</Text>
-      </View>
+    <View style={[styles.container, { backgroundColor: c.bgPage }]}>
+      <AppHeader variant="screen" title="Opportunities" />
 
       {/* Search */}
-      <View style={styles.searchWrap}>
+      <View style={[styles.searchWrap, { backgroundColor: c.bgPage }]}>
         <TextInput
-          style={styles.searchInput}
+          style={[styles.searchInput, { backgroundColor: c.bgInput, borderColor: c.border, color: c.textPrimary }]}
           placeholder="Search by role, company or location..."
-          placeholderTextColor={colors.t4}
+          placeholderTextColor={c.textMuted}
           value={search}
           onChangeText={setSearch}
         />
@@ -134,17 +145,17 @@ export default function OpportunitiesScreen() {
       >
         {TYPE_FILTERS.map(f => {
           const active = typeFilter === f.value
-          const tColor = f.value !== 'ALL' ? (typeColors[f.value] ?? colors.accent) : colors.accent
+          const tInfo = f.value !== 'ALL' ? typeColors[f.value] : null
+          const activeBg   = active ? (tInfo ? c[tInfo.bg]   : c.blueLight) : c.bgInput
+          const activeText = active ? (tInfo ? c[tInfo.text]  : c.blue)     : c.textMuted
+          const activeBorder = active ? (tInfo ? c[tInfo.text] : c.blue) + '40' : c.border
           return (
             <TouchableOpacity
               key={f.value}
-              style={[
-                styles.filterChip,
-                active && { backgroundColor: `${tColor}15`, borderColor: `${tColor}40` },
-              ]}
+              style={[styles.filterChip, { backgroundColor: activeBg, borderColor: activeBorder }]}
               onPress={() => setTypeFilter(f.value)}
             >
-              <Text style={[styles.filterChipText, active && { color: tColor, fontWeight: '700' }]}>
+              <Text style={[styles.filterChipText, { color: activeText, fontWeight: active ? '700' : '500' }]}>
                 {f.label}
               </Text>
             </TouchableOpacity>
@@ -152,12 +163,12 @@ export default function OpportunitiesScreen() {
         })}
       </ScrollView>
 
-      <Text style={styles.count}>{filtered.length} opportunities</Text>
+      <Text style={[styles.count, { color: c.textMuted }]}>{filtered.length} opportunities</Text>
 
       <FlatList
         data={filtered}
         keyExtractor={o => o.id}
-        renderItem={({ item }) => <OppCard opp={item} />}
+        renderItem={({ item }) => <OppCard opp={item} c={c} />}
         contentContainerStyle={[styles.list, { paddingBottom: insets.bottom + 24 }]}
         showsVerticalScrollIndicator={false}
       />
@@ -166,96 +177,59 @@ export default function OpportunitiesScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.bg1 },
-
-  pageHeader: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border1,
-  },
-  eyebrow: { fontSize: 9, color: colors.accent, letterSpacing: 1.6, textTransform: 'uppercase', fontFamily: 'Geist-Medium', marginBottom: 3 },
-  pageTitle: { fontSize: 22, fontFamily: 'Geist-Bold', color: colors.t1, letterSpacing: -0.5 },
+  container: { flex: 1 },
 
   searchWrap: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 8 },
   searchInput: {
-    backgroundColor: colors.bg2,
     borderWidth: 1,
-    borderColor: colors.border1,
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 10,
     fontSize: 13,
-    color: colors.t1,
+    fontFamily: 'Geist-Regular',
   },
 
   filterScroll: { flexGrow: 0 },
-  filterRow: { paddingLeft: 16, paddingRight: 8, paddingBottom: 8, flexDirection: 'row', alignItems: 'center' },
+  filterRow: { paddingLeft: 16, paddingRight: 8, paddingBottom: 10, flexDirection: 'row', alignItems: 'center' },
   filterChip: {
     paddingHorizontal: 14,
     paddingVertical: 7,
     borderRadius: 999,
-    backgroundColor: colors.bg2,
     borderWidth: 1,
-    borderColor: colors.border1,
     marginRight: 8,
   },
-  filterChipText: { fontSize: 12, color: colors.t3, fontWeight: '500' },
+  filterChipText: { fontSize: 12, fontFamily: 'Geist-Medium' },
 
-  count: { fontSize: 11, color: colors.t4, paddingHorizontal: 16, paddingBottom: 6 },
+  count: { fontSize: 11, fontFamily: 'Geist-Regular', paddingHorizontal: 16, paddingBottom: 6 },
   list: { paddingHorizontal: 16, gap: 8 },
 
   card: {
-    backgroundColor: colors.bg2,
     borderWidth: 1,
-    borderColor: colors.border1,
     borderRadius: 14,
     overflow: 'hidden',
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 8,
+    elevation: 2,
   },
-  cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    padding: 14,
-    gap: 10,
-  },
+  cardHeader: { flexDirection: 'row', alignItems: 'flex-start', padding: 14, gap: 10 },
   cardLeft: { flex: 1, gap: 4 },
   cardTopRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 2 },
-  typeBadge: {
-    paddingHorizontal: 9,
-    paddingVertical: 3,
-    borderRadius: 999,
-    borderWidth: 1,
-  },
-  typeBadgeText: { fontSize: 9, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase' },
-  sponsoredBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 999,
-    backgroundColor: `${colors.t4}12`,
-    borderWidth: 1,
-    borderColor: `${colors.t4}22`,
-  },
-  sponsoredText: { fontSize: 9, color: colors.t4, fontWeight: '600', letterSpacing: 0.4 },
-  cardTitle: { fontSize: 14, fontFamily: 'Geist-SemiBold', color: colors.t1, lineHeight: 20 },
-  cardCompany: { fontSize: 12, color: colors.accent, fontFamily: 'Geist-Medium' },
-  cardMeta: { flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' },
-  cardMetaText: { fontSize: 11, color: colors.t3 },
-  cardMetaDot: { fontSize: 11, color: colors.t4 },
-  modeChip: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
-  modeChipText: { fontSize: 9, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.4 },
-  chevron: { fontSize: 10, color: colors.t4, marginTop: 2 },
+  typeBadge: { paddingHorizontal: 7, paddingVertical: 3, borderRadius: 5 },
+  typeBadgeText: { fontSize: 10, fontWeight: '600', letterSpacing: 0.3 },
+  sponsoredBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 5, borderWidth: 1 },
+  sponsoredText: { fontSize: 10, fontWeight: '500' },
+  cardTitle: { fontSize: 14, fontFamily: 'Geist-SemiBold', lineHeight: 20 },
+  cardCompany: { fontSize: 12, fontFamily: 'Geist-Medium' },
+  cardMeta: { flexDirection: 'row', alignItems: 'center', gap: 5, flexWrap: 'wrap', marginTop: 2 },
+  cardMetaText: { fontSize: 11, fontFamily: 'Geist-Regular' },
+  cardMetaDot: { fontSize: 11 },
+  modeChip: { paddingHorizontal: 7, paddingVertical: 2, borderRadius: 5 },
+  modeChipText: { fontSize: 10, fontWeight: '500' },
 
   cardBody: { paddingHorizontal: 14, paddingBottom: 14, gap: 10 },
-  divider: { height: 1, backgroundColor: colors.border1, marginBottom: 4 },
-  description: { fontSize: 12, color: colors.t2, lineHeight: 18 },
-  metaLine: { fontSize: 11, color: colors.t3 },
-  applyBtn: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 16,
-    paddingVertical: 9,
-    borderRadius: 10,
-    marginTop: 2,
-  },
+  divider: { height: 1, marginBottom: 4 },
+  description: { fontSize: 12, fontFamily: 'Geist-Regular', lineHeight: 18 },
+  metaLine: { fontSize: 11, fontFamily: 'Geist-Regular' },
+  applyBtn: { alignSelf: 'flex-start', paddingHorizontal: 16, paddingVertical: 9, borderRadius: 10, marginTop: 2 },
   applyBtnText: { color: '#fff', fontSize: 13, fontWeight: '700' },
 })

@@ -1,154 +1,156 @@
 import { useState } from 'react'
 import {
-  View,
-  Text,
-  TouchableOpacity,
-  Linking,
-  StyleSheet,
-  LayoutAnimation,
-  Platform,
-  UIManager,
+  View, Text, TouchableOpacity, Linking, StyleSheet,
+  LayoutAnimation, Platform, UIManager,
 } from 'react-native'
-import { colors } from '../lib/theme'
+import { ChevronDown, ChevronUp, ArrowRight } from 'lucide-react-native'
+import { useTheme } from '../lib/ThemeContext'
 import type { SCAOpportunity } from '../lib/types'
 
 if (Platform.OS === 'android') {
   UIManager.setLayoutAnimationEnabledExperimental?.(true)
 }
 
-function Tag({ label, accent }: { label: string; accent?: boolean }) {
+function Tag({ label, accent, c }: { label: string; accent?: boolean; c: any }) {
   return (
-    <View style={[styles.tag, accent && styles.tagAccent]}>
-      {accent && <View style={styles.pulse} />}
-      <Text style={[styles.tagText, accent && styles.tagTextAccent]}>{label}</Text>
+    <View style={[
+      styles.tag,
+      { backgroundColor: accent ? c.blueLight : c.bgInput, borderColor: accent ? `${c.blue}30` : c.border },
+    ]}>
+      {accent && <View style={[styles.pulse, { backgroundColor: c.blue }]} />}
+      <Text style={[styles.tagText, { color: accent ? c.blue : c.textSecondary }]}>{label}</Text>
     </View>
   )
 }
 
-function Pill({ label }: { label: string }) {
+function Pill({ label, c }: { label: string; c: any }) {
   return (
-    <View style={styles.pill}>
-      <Text style={styles.pillText}>{label}</Text>
+    <View style={[styles.pill, { backgroundColor: c.bgInput, borderColor: c.border }]}>
+      <Text style={[styles.pillText, { color: c.textSecondary }]}>{label}</Text>
     </View>
   )
 }
 
-function SkillChip({ label }: { label: string }) {
+function SkillChip({ label, c }: { label: string; c: any }) {
   return (
-    <View style={styles.skillChip}>
-      <Text style={styles.skillChipText}>{label}</Text>
+    <View style={[styles.skillChip, { backgroundColor: c.blueLight }]}>
+      <Text style={[styles.skillChipText, { color: c.blueText }]}>{label}</Text>
     </View>
   )
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, children, c }: { title: string; children: React.ReactNode; c: any }) {
   return (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
+      <Text style={[styles.sectionTitle, { color: c.textMuted }]}>{title}</Text>
       {children}
     </View>
   )
 }
 
-function BulletItem({ text }: { text: string }) {
+function BulletItem({ text, c }: { text: string; c: any }) {
   return (
     <View style={styles.bulletRow}>
-      <Text style={styles.bulletArrow}>→</Text>
-      <Text style={styles.bulletText}>{text}</Text>
+      <ArrowRight size={12} color={c.blue} strokeWidth={2} style={{ marginTop: 2 }} />
+      <Text style={[styles.bulletText, { color: c.textSecondary }]}>{text}</Text>
     </View>
   )
 }
 
-function BenefitItem({ text }: { text: string }) {
+function BenefitItem({ text, c }: { text: string; c: any }) {
   return (
     <View style={styles.benefitRow}>
-      <Text style={styles.benefitStar}>✦</Text>
-      <Text style={styles.benefitText}>{text}</Text>
+      <View style={[styles.benefitDot, { backgroundColor: c.blue }]} />
+      <Text style={[styles.benefitText, { color: c.textSecondary }]}>{text}</Text>
     </View>
   )
 }
 
 export default function OpportunityCard({ opp }: { opp: SCAOpportunity }) {
+  const { colors: c } = useTheme()
   const [open, setOpen] = useState(false)
 
   function toggle() {
     LayoutAnimation.configureNext({
       duration: 280,
-      create: {
-        type: LayoutAnimation.Types.easeInEaseOut,
-        property: LayoutAnimation.Properties.opacity,
-      },
+      create: { type: LayoutAnimation.Types.easeInEaseOut, property: LayoutAnimation.Properties.opacity },
       update: { type: LayoutAnimation.Types.easeInEaseOut },
-      delete: {
-        type: LayoutAnimation.Types.easeInEaseOut,
-        property: LayoutAnimation.Properties.opacity,
-      },
+      delete: { type: LayoutAnimation.Types.easeInEaseOut, property: LayoutAnimation.Properties.opacity },
     })
     setOpen(o => !o)
   }
 
   return (
-    <View style={styles.card}>
+    <View style={[
+      styles.card,
+      { backgroundColor: c.bgCard, borderColor: c.border },
+      c.isDark
+        ? { shadowColor: '#000', shadowOpacity: 0.25 }
+        : { shadowColor: '#0b1120', shadowOpacity: 0.05 },
+    ]}>
       <TouchableOpacity onPress={toggle} activeOpacity={0.75} style={styles.header}>
         <View style={styles.headerLeft}>
           <View style={styles.tagRow}>
-            <Tag label="Now open" accent />
-            <Tag label={opp.division} />
-            {opp.extraTags.map(t => <Tag key={t} label={t} />)}
+            <Tag label="Now open" accent c={c} />
+            <Tag label={opp.division} c={c} />
+            {opp.extraTags.map(t => <Tag key={t} label={t} c={c} />)}
           </View>
-          <Text style={styles.title}>{opp.title}</Text>
-          <Text style={styles.subtitle}>{opp.subtitle}</Text>
+          <Text style={[styles.title, { color: c.textPrimary }]}>{opp.title}</Text>
+          <Text style={[styles.subtitle, { color: c.textSecondary }]}>{opp.subtitle}</Text>
         </View>
-        <Text style={[styles.chevron, open && styles.chevronOpen]}>▼</Text>
+        {open
+          ? <ChevronUp size={16} color={c.textMuted} strokeWidth={2} />
+          : <ChevronDown size={16} color={c.textMuted} strokeWidth={2} />
+        }
       </TouchableOpacity>
 
       {open && (
         <View>
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: c.border }]} />
           <View style={styles.body}>
-            <Text style={styles.description}>{opp.description}</Text>
+            <Text style={[styles.description, { color: c.textSecondary }]}>{opp.description}</Text>
 
             {opp.roles && opp.roles.length > 0 && (
-              <Section title="ROLES AVAILABLE">
+              <Section title="ROLES AVAILABLE" c={c}>
                 <View style={styles.row}>
-                  {opp.roles.map(r => <Pill key={r} label={r} />)}
+                  {opp.roles.map(r => <Pill key={r} label={r} c={c} />)}
                 </View>
               </Section>
             )}
 
-            <Section title="WHAT YOU'LL DO">
-              {opp.whatYoullDo.map(item => <BulletItem key={item} text={item} />)}
+            <Section title="WHAT YOU'LL DO" c={c}>
+              {opp.whatYoullDo.map(item => <BulletItem key={item} text={item} c={c} />)}
             </Section>
 
             <View style={styles.twoCol}>
               <View style={styles.col}>
-                <Text style={styles.sectionTitle}>EXPECTED SKILLS</Text>
+                <Text style={[styles.sectionTitle, { color: c.textMuted }]}>EXPECTED SKILLS</Text>
                 <View style={styles.row}>
-                  {opp.skills.map(s => <SkillChip key={s} label={s} />)}
+                  {opp.skills.map(s => <SkillChip key={s} label={s} c={c} />)}
                 </View>
-                <Text style={styles.noteText}>{opp.skillsNote}</Text>
+                <Text style={[styles.noteText, { color: c.textMuted }]}>{opp.skillsNote}</Text>
               </View>
               <View style={styles.col}>
-                <Text style={styles.sectionTitle}>EXPERIENCE</Text>
-                <Text style={styles.bodySmall}>{opp.experienceNote}</Text>
+                <Text style={[styles.sectionTitle, { color: c.textMuted }]}>EXPERIENCE</Text>
+                <Text style={[styles.bodySmall, { color: c.textSecondary }]}>{opp.experienceNote}</Text>
               </View>
             </View>
 
-            <View style={styles.benefitsBox}>
-              <Text style={styles.sectionTitle}>WHY APPLY</Text>
-              {opp.benefits.map(b => <BenefitItem key={b} text={b} />)}
+            <View style={[styles.benefitsBox, { backgroundColor: c.bgInput, borderColor: c.border }]}>
+              <Text style={[styles.sectionTitle, { color: c.textMuted }]}>WHY APPLY</Text>
+              {opp.benefits.map(b => <BenefitItem key={b} text={b} c={c} />)}
             </View>
           </View>
 
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: c.border }]} />
           <View style={styles.footer}>
             <View>
-              <Text style={styles.footerText}>{opp.footer}</Text>
+              <Text style={[styles.footerText, { color: c.textMuted }]}>{opp.footer}</Text>
               {opp.organiser && (
                 <View style={styles.organiserRow}>
-                  <Text style={styles.footerText}>Organiser: </Text>
+                  <Text style={[styles.footerText, { color: c.textMuted }]}>Organiser: </Text>
                   <TouchableOpacity onPress={() => Linking.openURL(`mailto:${opp.organiser!.email}`)}>
-                    <Text style={styles.link}>{opp.organiser.name}</Text>
+                    <Text style={[styles.link, { color: c.blue }]}>{opp.organiser.name}</Text>
                   </TouchableOpacity>
                 </View>
               )}
@@ -156,14 +158,14 @@ export default function OpportunityCard({ opp }: { opp: SCAOpportunity }) {
             <View style={styles.ctaRow}>
               {opp.contactEmail && (
                 <TouchableOpacity
-                  style={styles.btnOutline}
+                  style={[styles.btnOutline, { borderColor: c.border }]}
                   onPress={() => Linking.openURL(`mailto:${opp.contactEmail}`)}
                 >
-                  <Text style={styles.btnOutlineText}>Contact organiser</Text>
+                  <Text style={[styles.btnOutlineText, { color: c.textSecondary }]}>Contact organiser</Text>
                 </TouchableOpacity>
               )}
               <TouchableOpacity
-                style={styles.btnPrimary}
+                style={[styles.btnPrimary, { backgroundColor: c.blue }]}
                 onPress={() => Linking.openURL(opp.applyUrl)}
               >
                 <Text style={styles.btnPrimaryText}>Apply now →</Text>
@@ -178,126 +180,63 @@ export default function OpportunityCard({ opp }: { opp: SCAOpportunity }) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.bg2,
-    borderWidth: 1,
-    borderColor: colors.border1,
-    borderRadius: 16,
-    overflow: 'hidden',
-    marginBottom: 12,
+    borderWidth: 1, borderRadius: 16, overflow: 'hidden', marginBottom: 12,
+    shadowOffset: { width: 0, height: 2 }, shadowRadius: 8, elevation: 2,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    padding: 20,
-    gap: 12,
+    flexDirection: 'row', alignItems: 'flex-start',
+    justifyContent: 'space-between', padding: 20, gap: 12,
   },
   headerLeft: { flex: 1 },
   tagRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 8 },
   tag: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    borderRadius: 999,
-    backgroundColor: colors.bg3,
-    borderWidth: 1,
-    borderColor: colors.border2,
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    paddingHorizontal: 10, paddingVertical: 3,
+    borderRadius: 999, borderWidth: 1,
   },
-  tagAccent: {
-    backgroundColor: colors.accentBg,
-    borderColor: colors.accentBorder,
-  },
-  tagText: { fontSize: 10, color: colors.t3, fontFamily: 'Geist-Medium', letterSpacing: 0.5 },
-  tagTextAccent: { color: colors.accent },
-  pulse: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: colors.accent,
-  },
-  title: { fontSize: 17, fontFamily: 'Geist-Bold', color: colors.t1, letterSpacing: -0.3 },
-  subtitle: { fontSize: 12, color: colors.t3, marginTop: 2 },
-  chevron: { fontSize: 11, color: colors.t4, marginTop: 4 },
-  chevronOpen: { opacity: 0.6 },
+  tagText: { fontSize: 10, fontFamily: 'Geist-Medium', letterSpacing: 0.3 },
+  pulse: { width: 6, height: 6, borderRadius: 3 },
+  title: { fontSize: 17, fontFamily: 'Geist-Bold', letterSpacing: -0.3 },
+  subtitle: { fontSize: 12, fontFamily: 'Geist-Regular', marginTop: 2 },
 
-  divider: { height: 1, backgroundColor: colors.border1 },
+  divider: { height: 1 },
   body: { padding: 20, gap: 18 },
-  description: { fontSize: 13, color: colors.t2, lineHeight: 20 },
+  description: { fontSize: 13, fontFamily: 'Geist-Regular', lineHeight: 20 },
 
   section: { gap: 6 },
   sectionTitle: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: colors.t4,
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
-    marginBottom: 4,
+    fontSize: 10, fontWeight: '700', letterSpacing: 0.8,
+    textTransform: 'uppercase', marginBottom: 4,
   },
   row: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   pill: {
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 8,
-    backgroundColor: colors.bg3,
-    borderWidth: 1,
-    borderColor: colors.border2,
+    paddingHorizontal: 12, paddingVertical: 5,
+    borderRadius: 8, borderWidth: 1,
   },
-  pillText: { fontSize: 12, color: colors.t2, fontWeight: '500' },
-  skillChip: {
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    borderRadius: 6,
-    backgroundColor: colors.accentBg,
-    borderWidth: 1,
-    borderColor: colors.accentBorder,
-  },
-  skillChipText: { fontSize: 11, color: colors.accent, fontWeight: '600' },
-  noteText: { fontSize: 11, color: colors.t4, marginTop: 4 },
-  bodySmall: { fontSize: 11, color: colors.t3 },
+  pillText: { fontSize: 12, fontFamily: 'Geist-Medium' },
+  skillChip: { paddingHorizontal: 10, paddingVertical: 3, borderRadius: 6 },
+  skillChipText: { fontSize: 11, fontFamily: 'Geist-Medium' },
+  noteText: { fontSize: 11, fontFamily: 'Geist-Regular', marginTop: 4 },
+  bodySmall: { fontSize: 11, fontFamily: 'Geist-Regular' },
 
   bulletRow: { flexDirection: 'row', gap: 8, alignItems: 'flex-start' },
-  bulletArrow: { color: colors.accent, fontSize: 12, marginTop: 1 },
-  bulletText: { fontSize: 12, color: colors.t2, flex: 1, lineHeight: 18 },
+  bulletText: { fontSize: 12, fontFamily: 'Geist-Regular', flex: 1, lineHeight: 18 },
 
   twoCol: { flexDirection: 'row', gap: 16 },
   col: { flex: 1 },
 
-  benefitsBox: {
-    backgroundColor: colors.bg3,
-    borderWidth: 1,
-    borderColor: colors.border1,
-    borderRadius: 12,
-    padding: 14,
-    gap: 6,
-  },
-  benefitRow: { flexDirection: 'row', alignItems: 'center', gap: 7 },
-  benefitStar: { color: colors.accent, fontSize: 9 },
-  benefitText: { fontSize: 12, color: colors.t2 },
+  benefitsBox: { borderWidth: 1, borderRadius: 12, padding: 14, gap: 6 },
+  benefitRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  benefitDot: { width: 5, height: 5, borderRadius: 3 },
+  benefitText: { fontSize: 12, fontFamily: 'Geist-Regular' },
 
-  footer: {
-    padding: 16,
-    paddingHorizontal: 20,
-    gap: 12,
-  },
-  footerText: { fontSize: 11, color: colors.t4 },
+  footer: { padding: 16, paddingHorizontal: 20, gap: 12 },
+  footerText: { fontSize: 11, fontFamily: 'Geist-Regular' },
   organiserRow: { flexDirection: 'row', alignItems: 'center', marginTop: 2 },
-  link: { fontSize: 11, color: colors.accent, fontWeight: '600' },
+  link: { fontSize: 11, fontFamily: 'Geist-SemiBold' },
   ctaRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
-  btnOutline: {
-    paddingHorizontal: 14,
-    paddingVertical: 9,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.border2,
-  },
-  btnOutlineText: { fontSize: 12, color: colors.t2, fontWeight: '500' },
-  btnPrimary: {
-    paddingHorizontal: 18,
-    paddingVertical: 9,
-    borderRadius: 12,
-    backgroundColor: colors.accent,
-  },
-  btnPrimaryText: { fontSize: 13, color: '#fff', fontWeight: '700' },
+  btnOutline: { paddingHorizontal: 14, paddingVertical: 9, borderRadius: 12, borderWidth: 1 },
+  btnOutlineText: { fontSize: 12, fontFamily: 'Geist-Medium' },
+  btnPrimary: { paddingHorizontal: 18, paddingVertical: 9, borderRadius: 12 },
+  btnPrimaryText: { fontSize: 13, color: '#fff', fontFamily: 'Geist-SemiBold' },
 })

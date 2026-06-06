@@ -97,7 +97,6 @@ export function PhonePreview() {
             display: "flex", alignItems: "center", gap: 6,
             alignSelf: "flex-start",
           }}>
-            <span style={{ fontSize: 16 }}>📱</span>
             <span style={{ fontSize: 13, color: "#e6edf3", fontWeight: 600 }}>Expo Go</span>
             <span style={{
               fontSize: 9, color: "#3fb68b", background: "rgba(63,182,139,0.1)",
@@ -132,7 +131,6 @@ export function PhonePreview() {
           display: "flex", flexDirection: "column", alignItems: "center", gap: 10, width: "100%",
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, alignSelf: "flex-start" }}>
-            <span style={{ fontSize: 16 }}>🌐</span>
             <span style={{ fontSize: 13, color: "#e6edf3", fontWeight: 600 }}>Mobile Browser</span>
           </div>
           <img src={WEB_QR} alt="Web QR" style={{ width: 172, height: 172, borderRadius: 10 }} />
@@ -143,7 +141,7 @@ export function PhonePreview() {
 
         {/* Footnote */}
         <p style={{ fontSize: 10, color: "#484f58", margin: 0, lineHeight: 1.6 }}>
-          ⚠️ The Expo Go URL changes when the server restarts. If it stops working, check the Console tab for the new QR code.
+          Note: The Expo Go URL changes when the server restarts. If it stops working, check the Console tab for the new QR code.
         </p>
       </div>
     </div>

@@ -2,11 +2,13 @@ import { useState } from 'react'
 import { NavigationContainer } from '@react-navigation/native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import { StatusBar, Text, View, TouchableOpacity, StyleSheet, ScrollView } from 'react-native'
+import { StatusBar, Text, View, TouchableOpacity, StyleSheet, ScrollView, Switch } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { useFonts } from 'expo-font'
-import { colors, fonts } from './lib/theme'
+import { Home, Briefcase, Star, Calendar, MoreHorizontal, ChevronRight, Users, FileText, Info } from 'lucide-react-native'
+import { ThemeProvider, useTheme } from './lib/ThemeContext'
 import SplashScreen from './components/SplashScreen'
+import AppHeader from './components/AppHeader'
 
 import HomeScreen from './screens/HomeScreen'
 import OpportunitiesScreen from './screens/OpportunitiesScreen'
@@ -19,49 +21,73 @@ import AboutScreen from './screens/AboutScreen'
 const Tab = createBottomTabNavigator()
 const MoreStack = createNativeStackNavigator()
 
-function TabIcon({ name, focused }: { name: string; focused: boolean }) {
-  const icons: Record<string, string> = {
-    Home: '⌂',
-    Opportunities: '◈',
-    SCA: '★',
-    Events: '◷',
-    More: '···',
-  }
-  return (
-    <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-      <Text style={{ fontSize: name === 'More' ? 10 : 16, color: focused ? colors.accent : colors.t4, fontFamily: 'Geist-Regular' }}>
-        {icons[name] ?? '●'}
-      </Text>
-    </View>
-  )
+const TAB_ICONS: Record<string, any> = {
+  Home:          Home,
+  Opportunities: Briefcase,
+  SCA:           Star,
+  Events:        Calendar,
+  More:          MoreHorizontal,
 }
 
 import { useNavigation } from '@react-navigation/native'
 
 function MoreHomeScreen() {
   const navigation = useNavigation<any>()
+  const { colors: c, isDark, toggle } = useTheme()
+
   const items = [
-    { label: 'Committee', desc: 'Meet the people behind the SCA', screen: 'Committee' },
-    { label: 'Resources', desc: 'CV templates, cover letters & guides', screen: 'Resources' },
-    { label: 'About', desc: 'Who we are and what we do', screen: 'About' },
+    { label: 'Committee', desc: 'Meet the people behind the SCA', screen: 'Committee', icon: Users },
+    { label: 'Resources', desc: 'CV templates, cover letters & guides', screen: 'Resources', icon: FileText },
+    { label: 'About', desc: 'Who we are and what we do', screen: 'About', icon: Info },
   ]
+
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: colors.bg1 }} contentContainerStyle={{ padding: 16, paddingBottom: 32, gap: 8 }}>
-      {items.map(item => (
-        <TouchableOpacity
-          key={item.screen}
-          style={moreStyles.card}
-          onPress={() => navigation.navigate(item.screen)}
-          activeOpacity={0.75}
-        >
-          <View style={{ flex: 1 }}>
-            <Text style={moreStyles.label}>{item.label}</Text>
-            <Text style={moreStyles.desc}>{item.desc}</Text>
+    <View style={{ flex: 1, backgroundColor: c.bgPage }}>
+      <AppHeader variant="brand" />
+      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 32, gap: 8 }} showsVerticalScrollIndicator={false}>
+        {items.map(item => {
+          const Icon = item.icon
+          return (
+            <TouchableOpacity
+              key={item.screen}
+              style={[moreStyles.card, { backgroundColor: c.bgCard, borderColor: c.border }]}
+              onPress={() => navigation.navigate(item.screen)}
+              activeOpacity={0.75}
+            >
+              <View style={[moreStyles.iconBox, { backgroundColor: c.blueLight }]}>
+                <Icon size={18} color={c.blue} strokeWidth={1.75} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={[moreStyles.label, { color: c.textPrimary }]}>{item.label}</Text>
+                <Text style={[moreStyles.desc, { color: c.textMuted }]}>{item.desc}</Text>
+              </View>
+              <ChevronRight size={16} color={c.textMuted} strokeWidth={1.75} />
+            </TouchableOpacity>
+          )
+        })}
+
+        {/* Appearance */}
+        <View style={[moreStyles.section, { borderTopColor: c.border }]}>
+          <Text style={[moreStyles.sectionLabel, { color: c.textMuted }]}>APPEARANCE</Text>
+        </View>
+        <View style={[moreStyles.card, moreStyles.cardRow, { backgroundColor: c.bgCard, borderColor: c.border }]}>
+          <View style={[moreStyles.iconBox, { backgroundColor: c.bgInput }]}>
+            {isDark
+              ? <Star size={18} color={c.textSecondary} strokeWidth={1.75} />
+              : <Star size={18} color={c.textSecondary} strokeWidth={1.75} />}
           </View>
-          <Text style={moreStyles.arrow}>→</Text>
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
+          <Text style={[moreStyles.label, { color: c.textPrimary, flex: 1 }]}>Dark mode</Text>
+          <Switch
+            value={isDark}
+            onValueChange={toggle}
+            trackColor={{ false: c.border, true: c.blue }}
+            thumbColor="#fff"
+          />
+        </View>
+
+        <Text style={[moreStyles.version, { color: c.textMuted }]}>BCUSCA v1.0.0</Text>
+      </ScrollView>
+    </View>
   )
 }
 
@@ -69,40 +95,53 @@ const moreStyles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.bg2,
     borderWidth: 1,
-    borderColor: colors.border1,
-    borderRadius: 12,
-    paddingHorizontal: 16,
+    borderRadius: 14,
+    paddingHorizontal: 14,
     paddingVertical: 14,
-    gap: 8,
+    gap: 12,
+    shadowColor: '#0b1120',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 1,
   },
-  label: { fontSize: 14, fontWeight: '700', color: colors.t1, marginBottom: 2, fontFamily: 'Geist-Bold' },
-  desc: { fontSize: 11, color: colors.t4, fontFamily: 'Geist-Regular' },
-  arrow: { fontSize: 16, color: colors.t4 },
+  cardRow: { justifyContent: 'space-between' },
+  iconBox: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  label: { fontSize: 14, fontFamily: 'Geist-SemiBold', marginBottom: 2 },
+  desc: { fontSize: 11, fontFamily: 'Geist-Regular' },
+  section: { borderTopWidth: 1, paddingTop: 16, marginTop: 8 },
+  sectionLabel: { fontSize: 10, fontFamily: 'Geist-Medium', letterSpacing: 1.2, textTransform: 'uppercase' },
+  version: { fontSize: 11, fontFamily: 'Geist-Regular', textAlign: 'center', marginTop: 16 },
 })
 
 function MoreStackNavigator() {
+  const { colors: c } = useTheme()
   return (
     <MoreStack.Navigator
       screenOptions={{
-        headerStyle: { backgroundColor: colors.bg1 },
-        headerTintColor: colors.t1,
-        headerTitleStyle: { fontWeight: '700', fontSize: 17, fontFamily: 'Geist-Bold' } as any,
-        headerShadowVisible: false,
-        contentStyle: { backgroundColor: colors.bg1 },
+        headerShown: false,
+        contentStyle: { backgroundColor: c.bgPage },
       }}
     >
-      <MoreStack.Screen name="MoreHome" component={MoreHomeScreen} options={{ title: 'More' }} />
-      <MoreStack.Screen name="Committee" component={CommitteeScreen} options={{ title: 'Committee' }} />
-      <MoreStack.Screen name="Resources" component={ResourcesScreen} options={{ title: 'Resources' }} />
-      <MoreStack.Screen name="About" component={AboutScreen} options={{ title: 'About' }} />
+      <MoreStack.Screen name="MoreHome" component={MoreHomeScreen} />
+      <MoreStack.Screen name="Committee" component={CommitteeScreen} />
+      <MoreStack.Screen name="Resources" component={ResourcesScreen} />
+      <MoreStack.Screen name="About" component={AboutScreen} />
     </MoreStack.Navigator>
   )
 }
 
-export default function App() {
+function ThemedApp() {
   const [splashDone, setSplashDone] = useState(false)
+  const { colors: c, isDark } = useTheme()
 
   const [fontsLoaded] = useFonts({
     'Geist-Light':    require('./assets/fonts/Geist-Light.ttf'),
@@ -115,29 +154,35 @@ export default function App() {
   if (!fontsLoaded) return null
 
   return (
-    <SafeAreaProvider>
-      <StatusBar barStyle="light-content" backgroundColor={colors.bg1} />
+    <>
+      <StatusBar
+        barStyle={isDark ? 'light-content' : 'dark-content'}
+        backgroundColor={c.bgHeader}
+      />
       <NavigationContainer>
         <Tab.Navigator
           screenOptions={({ route }) => ({
-            tabBarIcon: ({ focused }) => <TabIcon name={route.name} focused={focused} />,
+            headerShown: false,
+            tabBarIcon: ({ focused, color }) => {
+              const Icon = TAB_ICONS[route.name]
+              return Icon ? <Icon size={20} color={color} strokeWidth={focused ? 2.25 : 1.75} accessibilityLabel={route.name} /> : null
+            },
             tabBarStyle: {
-              backgroundColor: colors.bg1,
-              borderTopColor: colors.border1,
+              backgroundColor: c.bgHeader,
+              borderTopColor: c.border,
               borderTopWidth: 1,
               height: 60,
               paddingBottom: 8,
             },
-            tabBarActiveTintColor: colors.accent,
-            tabBarInactiveTintColor: colors.t4,
-            tabBarLabelStyle: { fontSize: 10, fontWeight: '600', fontFamily: 'Geist-Medium' } as any,
-            headerShown: false,
+            tabBarActiveTintColor: c.blue,
+            tabBarInactiveTintColor: c.textMuted,
+            tabBarLabelStyle: { fontSize: 10, fontFamily: 'Geist-Medium' } as any,
           })}
         >
-          <Tab.Screen name="Home" component={HomeScreen} options={{ title: 'SCA' }} />
+          <Tab.Screen name="Home" component={HomeScreen} options={{ title: 'Home' }} />
           <Tab.Screen name="Opportunities" component={OpportunitiesScreen} />
-          <Tab.Screen name="SCA" component={SCAScreen} options={{ title: 'SCA Roles' }} />
           <Tab.Screen name="Events" component={EventsScreen} />
+          <Tab.Screen name="SCA" component={SCAScreen} options={{ title: 'SCA Roles' }} />
           <Tab.Screen name="More" component={MoreStackNavigator} options={{ headerShown: false }} />
         </Tab.Navigator>
       </NavigationContainer>
@@ -145,6 +190,16 @@ export default function App() {
       {!splashDone && fontsLoaded && (
         <SplashScreen onDone={() => setSplashDone(true)} />
       )}
+    </>
+  )
+}
+
+export default function App() {
+  return (
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <ThemedApp />
+      </ThemeProvider>
     </SafeAreaProvider>
   )
 }

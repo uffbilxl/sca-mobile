@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Linking } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { colors } from '../lib/theme'
+import { Linkedin, ExternalLink } from 'lucide-react-native'
+import { useTheme } from '../lib/ThemeContext'
+import AppHeader from '../components/AppHeader'
 
 interface Member { name: string; role: string; linkedin?: string; website?: string }
 interface Division { name: string; color: string; members: Member[] }
@@ -60,31 +62,33 @@ function initials(name: string) {
   return name.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase()
 }
 
-function MemberCard({ member, color }: { member: Member; color: string }) {
+function MemberCard({ member, color, c }: { member: Member; color: string; c: any }) {
   return (
-    <View style={[styles.memberCard, { borderColor: `${color}25` }]}>
-      <View style={[styles.avatar, { backgroundColor: `${color}18`, borderColor: `${color}30` }]}>
+    <View style={[styles.memberCard, { backgroundColor: c.bgInput, borderColor: c.border }]}>
+      <View style={[styles.avatar, { backgroundColor: `${color}15`, borderColor: `${color}30` }]}>
         <Text style={[styles.avatarText, { color }]}>{initials(member.name)}</Text>
       </View>
       <View style={styles.memberInfo}>
-        <Text style={styles.memberName}>{member.name}</Text>
-        <Text style={styles.memberRole}>{member.role}</Text>
+        <Text style={[styles.memberName, { color: c.textPrimary }]}>{member.name}</Text>
+        <Text style={[styles.memberRole, { color: c.textMuted }]}>{member.role}</Text>
       </View>
       <View style={styles.memberLinks}>
         {member.linkedin && (
           <TouchableOpacity
-            style={styles.linkBtn}
+            style={[styles.linkBtn, { backgroundColor: 'rgba(0,119,181,0.1)', borderColor: 'rgba(0,119,181,0.2)' }]}
             onPress={() => Linking.openURL(member.linkedin!)}
+            accessibilityLabel="LinkedIn"
           >
-            <Text style={styles.linkBtnText}>in</Text>
+            <Linkedin size={13} color="#0077b5" strokeWidth={1.75} />
           </TouchableOpacity>
         )}
         {member.website && (
           <TouchableOpacity
-            style={[styles.linkBtn, styles.linkBtnGray]}
+            style={[styles.linkBtn, { backgroundColor: c.bgInput, borderColor: c.border }]}
             onPress={() => Linking.openURL(member.website!)}
+            accessibilityLabel="Website"
           >
-            <Text style={styles.linkBtnGrayText}>↗</Text>
+            <ExternalLink size={13} color={c.textSecondary} strokeWidth={1.75} />
           </TouchableOpacity>
         )}
       </View>
@@ -94,229 +98,207 @@ function MemberCard({ member, color }: { member: Member; color: string }) {
 
 export default function CommitteeScreen() {
   const insets = useSafeAreaInsets()
+  const { colors: c } = useTheme()
   const [selected, setSelected] = useState<string | null>(null)
   const activeDivision = DIVISIONS.find(d => d.name === selected) ?? null
 
   return (
-    <ScrollView style={styles.scroll} contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 40 }]} showsVerticalScrollIndicator={false}>
-      <View style={styles.pageHeader}>
-        <Text style={styles.eyebrow}>Student Computing Association</Text>
-        <Text style={styles.pageTitle}>Meet the Committee</Text>
-        <Text style={styles.pageSubtitle}>The people behind the SCA, organising events, driving projects, and building the BCU computing community.</Text>
-      </View>
-
-      {/* Leadership */}
-      <View style={styles.sectionBlock}>
-        <View style={styles.sectionLabelRow}>
-          <Text style={styles.sectionLabel}>Leadership</Text>
-          <View style={styles.sectionLine} />
+    <View style={[styles.outer, { backgroundColor: c.bgPage }]}>
+      <AppHeader variant="brand" />
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 40 }]}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.pageHeader}>
+          <Text style={[styles.eyebrow, { color: c.blue }]}>Student Computing Association</Text>
+          <Text style={[styles.pageTitle, { color: c.textPrimary }]}>Meet the Committee</Text>
+          <Text style={[styles.pageSubtitle, { color: c.textSecondary }]}>The people behind the SCA, organising events, driving projects, and building the BCU computing community.</Text>
         </View>
 
-        {/* President */}
-        <View style={styles.presidentCard}>
-          <View style={[styles.avatar, styles.avatarLg, { backgroundColor: colors.accentBg, borderColor: colors.accentBorder }]}>
-            <Text style={[styles.avatarText, { color: colors.accent, fontSize: 16 }]}>TNS</Text>
+        {/* Leadership */}
+        <View style={styles.sectionBlock}>
+          <View style={styles.sectionLabelRow}>
+            <Text style={[styles.sectionLabel, { color: c.textMuted }]}>Leadership</Text>
+            <View style={[styles.sectionLine, { backgroundColor: c.border }]} />
           </View>
-          <View style={styles.memberInfo}>
-            <View style={styles.presidentRow}>
-              <Text style={styles.memberName}>{LEADERSHIP[0].name}</Text>
-              <View style={styles.presidentBadge}>
-                <Text style={styles.presidentBadgeText}>President</Text>
+
+          <View style={[styles.presidentCard, { backgroundColor: c.bgCard, borderColor: `${c.blue}20` }]}>
+            <View style={[styles.avatar, styles.avatarLg, { backgroundColor: c.blueLight, borderColor: `${c.blue}25` }]}>
+              <Text style={[styles.avatarText, { color: c.blue, fontSize: 16 }]}>TNS</Text>
+            </View>
+            <View style={styles.memberInfo}>
+              <View style={styles.presidentRow}>
+                <Text style={[styles.memberName, { color: c.textPrimary }]}>{LEADERSHIP[0].name}</Text>
+                <View style={[styles.presidentBadge, { backgroundColor: c.blueLight, borderColor: `${c.blue}30` }]}>
+                  <Text style={[styles.presidentBadgeText, { color: c.blue }]}>President</Text>
+                </View>
               </View>
             </View>
-          </View>
-          <View style={styles.memberLinks}>
-            {LEADERSHIP[0].linkedin && (
-              <TouchableOpacity style={styles.linkBtn} onPress={() => Linking.openURL(LEADERSHIP[0].linkedin!)}>
-                <Text style={styles.linkBtnText}>in</Text>
-              </TouchableOpacity>
-            )}
-            {LEADERSHIP[0].website && (
-              <TouchableOpacity style={[styles.linkBtn, styles.linkBtnGray]} onPress={() => Linking.openURL(LEADERSHIP[0].website!)}>
-                <Text style={styles.linkBtnGrayText}>↗</Text>
-              </TouchableOpacity>
-            )}
+            <View style={styles.memberLinks}>
+              {LEADERSHIP[0].linkedin && (
+                <TouchableOpacity
+                  style={[styles.linkBtn, { backgroundColor: 'rgba(0,119,181,0.1)', borderColor: 'rgba(0,119,181,0.2)' }]}
+                  onPress={() => Linking.openURL(LEADERSHIP[0].linkedin!)}
+                >
+                  <Linkedin size={13} color="#0077b5" strokeWidth={1.75} />
+                </TouchableOpacity>
+              )}
+              {LEADERSHIP[0].website && (
+                <TouchableOpacity
+                  style={[styles.linkBtn, { backgroundColor: c.bgInput, borderColor: c.border }]}
+                  onPress={() => Linking.openURL(LEADERSHIP[0].website!)}
+                >
+                  <ExternalLink size={13} color={c.textSecondary} strokeWidth={1.75} />
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
         </View>
-      </View>
 
-      {/* Divisions */}
-      <View style={styles.sectionBlock}>
-        <View style={styles.sectionLabelRow}>
-          <Text style={styles.sectionLabel}>Divisions</Text>
-          <View style={styles.sectionLine} />
-          {selected && (
-            <TouchableOpacity onPress={() => setSelected(null)}>
-              <Text style={styles.closeBtn}>✕ close</Text>
-            </TouchableOpacity>
+        {/* Divisions */}
+        <View style={styles.sectionBlock}>
+          <View style={styles.sectionLabelRow}>
+            <Text style={[styles.sectionLabel, { color: c.textMuted }]}>Divisions</Text>
+            <View style={[styles.sectionLine, { backgroundColor: c.border }]} />
+            {selected && (
+              <TouchableOpacity onPress={() => setSelected(null)}>
+                <Text style={[styles.closeBtn, { color: c.textMuted }]}>✕ close</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          <View style={styles.divisionGrid}>
+            {DIVISIONS.map(div => {
+              const isActive = selected === div.name
+              const vp = div.members[0]
+              return (
+                <TouchableOpacity
+                  key={div.name}
+                  style={[
+                    styles.divisionTile,
+                    {
+                      backgroundColor: isActive ? `${div.color}08` : c.bgCard,
+                      borderColor: isActive ? `${div.color}40` : c.border,
+                    },
+                  ]}
+                  onPress={() => setSelected(isActive ? null : div.name)}
+                  activeOpacity={0.75}
+                >
+                  <View style={[styles.divisionDot, { backgroundColor: div.color }]} />
+                  <Text style={[styles.divisionName, { color: c.textPrimary }]}>{div.name}</Text>
+                  <View style={styles.divisionVPRow}>
+                    <View style={[styles.vpBadge, { backgroundColor: `${div.color}12`, borderColor: `${div.color}30` }]}>
+                      <Text style={[styles.vpBadgeText, { color: div.color }]}>Vice President</Text>
+                    </View>
+                  </View>
+                  <Text style={[styles.divisionVP, { color: c.textSecondary }]}>{vp.name}</Text>
+                  <Text style={[styles.divisionCount, { color: c.textMuted }]}>
+                    {div.members.length - 1} member{div.members.length - 1 !== 1 ? 's' : ''}
+                  </Text>
+                </TouchableOpacity>
+              )
+            })}
+          </View>
+
+          {activeDivision && (
+            <View style={[styles.membersPanel, { borderColor: `${activeDivision.color}25` }]}>
+              <View style={[styles.membersPanelHeader, { backgroundColor: `${activeDivision.color}08`, borderBottomColor: `${activeDivision.color}20` }]}>
+                <View style={[styles.panelDot, { backgroundColor: activeDivision.color }]} />
+                <Text style={[styles.panelTitle, { color: c.textPrimary }]}>{activeDivision.name}</Text>
+                <Text style={[styles.panelCount, { color: c.textMuted }]}>{activeDivision.members.length} members</Text>
+              </View>
+              <View style={styles.membersList}>
+                {activeDivision.members.slice(1).map(m => (
+                  <MemberCard key={m.name} member={m} color={activeDivision.color} c={c} />
+                ))}
+              </View>
+            </View>
           )}
         </View>
 
-        <View style={styles.divisionGrid}>
-          {DIVISIONS.map(div => {
-            const isActive = selected === div.name
-            const vp = div.members[0]
-            return (
-              <TouchableOpacity
-                key={div.name}
-                style={[
-                  styles.divisionTile,
-                  { borderColor: isActive ? `${div.color}50` : colors.border1 },
-                  isActive && { backgroundColor: `${div.color}10` },
-                ]}
-                onPress={() => setSelected(isActive ? null : div.name)}
-                activeOpacity={0.75}
-              >
-                <View style={[styles.divisionDot, { backgroundColor: div.color }]} />
-                <Text style={styles.divisionName}>{div.name}</Text>
-                <View style={styles.divisionVPRow}>
-                  <View style={[styles.vpBadge, { backgroundColor: `${div.color}18`, borderColor: `${div.color}35` }]}>
-                    <Text style={[styles.vpBadgeText, { color: div.color }]}>Vice President</Text>
-                  </View>
-                </View>
-                <Text style={styles.divisionVP}>{vp.name}</Text>
-                <Text style={styles.divisionCount}>{div.members.length - 1} member{div.members.length - 1 !== 1 ? 's' : ''}</Text>
-              </TouchableOpacity>
-            )
-          })}
+        {/* Footer */}
+        <View style={[styles.footerBlock, { borderTopColor: c.border }]}>
+          <Text style={[styles.footerText, { color: c.textMuted }]}>Interested in joining the committee?{'  '}</Text>
+          <TouchableOpacity onPress={() => Linking.openURL('https://tally.so/r/681g7e')}>
+            <Text style={[styles.footerLink, { color: c.blue }]}>Apply here →</Text>
+          </TouchableOpacity>
         </View>
-
-        {activeDivision && (
-          <View style={[styles.membersPanel, { borderColor: `${activeDivision.color}30` }]}>
-            <View style={[styles.membersPanelHeader, { backgroundColor: `${activeDivision.color}10`, borderBottomColor: `${activeDivision.color}25` }]}>
-              <View style={[styles.panelDot, { backgroundColor: activeDivision.color }]} />
-              <Text style={styles.panelTitle}>{activeDivision.name}</Text>
-              <Text style={styles.panelCount}>{activeDivision.members.length} members</Text>
-            </View>
-            <View style={styles.membersList}>
-              {activeDivision.members.slice(1).map(m => (
-                <MemberCard key={m.name} member={m} color={activeDivision.color} />
-              ))}
-            </View>
-          </View>
-        )}
-      </View>
-
-      {/* Footer */}
-      <View style={styles.footerBlock}>
-        <Text style={styles.footerText}>Interested in joining the committee?{'  '}</Text>
-        <TouchableOpacity onPress={() => Linking.openURL('https://tally.so/r/681g7e')}>
-          <Text style={styles.footerLink}>Apply here →</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
-  scroll: { flex: 1, backgroundColor: colors.bg1 },
-  content: { padding: 16, paddingBottom: 40, gap: 24 },
+  outer: { flex: 1 },
+  scroll: { flex: 1 },
+  content: { padding: 16, gap: 24 },
   pageHeader: { gap: 6 },
-  eyebrow: { fontSize: 9, color: colors.accent, letterSpacing: 1.6, textTransform: 'uppercase', fontWeight: '700' },
-  pageTitle: { fontSize: 26, fontFamily: 'Geist-Bold', color: colors.t1, letterSpacing: -0.6 },
-  pageSubtitle: { fontSize: 12, color: colors.t3, lineHeight: 18 },
+  eyebrow: { fontSize: 9, letterSpacing: 1.6, textTransform: 'uppercase', fontWeight: '700' },
+  pageTitle: { fontSize: 26, fontFamily: 'Geist-Bold', letterSpacing: -0.6 },
+  pageSubtitle: { fontSize: 12, fontFamily: 'Geist-Regular', lineHeight: 18 },
 
   sectionBlock: { gap: 14 },
   sectionLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  sectionLabel: { fontSize: 9, fontWeight: '700', color: colors.t4, letterSpacing: 1.2, textTransform: 'uppercase' },
-  sectionLine: { flex: 1, height: 1, backgroundColor: colors.border1 },
-  closeBtn: { fontSize: 11, color: colors.t4 },
+  sectionLabel: { fontSize: 9, fontWeight: '700', letterSpacing: 1.2, textTransform: 'uppercase' },
+  sectionLine: { flex: 1, height: 1 },
+  closeBtn: { fontSize: 11 },
 
   presidentCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.bg2,
-    borderWidth: 1,
-    borderColor: `${colors.accent}25`,
-    borderRadius: 16,
-    padding: 16,
-    gap: 12,
+    flexDirection: 'row', alignItems: 'center',
+    borderWidth: 1, borderRadius: 16, padding: 16, gap: 12,
+    shadowColor: '#0b1120', shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05, shadowRadius: 8, elevation: 2,
   },
   presidentRow: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
-  presidentBadge: {
-    backgroundColor: colors.accentBg,
-    borderWidth: 1,
-    borderColor: colors.accentBorder,
-    borderRadius: 999,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-  },
-  presidentBadgeText: { fontSize: 9, color: colors.accent, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.6 },
+  presidentBadge: { borderWidth: 1, borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2 },
+  presidentBadgeText: { fontSize: 9, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.6 },
 
   avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    flexShrink: 0,
+    width: 40, height: 40, borderRadius: 10,
+    alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1, flexShrink: 0,
   },
   avatarLg: { width: 44, height: 44, borderRadius: 12 },
   avatarText: { fontSize: 13, fontWeight: '800' },
   memberInfo: { flex: 1 },
-  memberName: { fontSize: 13, fontFamily: 'Geist-SemiBold', color: colors.t1, lineHeight: 18 },
-  memberRole: { fontSize: 11, fontFamily: 'Geist-Regular', color: colors.t3 },
+  memberName: { fontSize: 13, fontFamily: 'Geist-SemiBold', lineHeight: 18 },
+  memberRole: { fontSize: 11, fontFamily: 'Geist-Regular' },
   memberLinks: { flexDirection: 'row', gap: 4 },
   linkBtn: {
-    width: 28,
-    height: 28,
-    borderRadius: 8,
-    backgroundColor: 'rgba(0,119,181,0.12)',
-    borderWidth: 1,
-    borderColor: 'rgba(0,119,181,0.25)',
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: 28, height: 28, borderRadius: 8,
+    borderWidth: 1, alignItems: 'center', justifyContent: 'center',
   },
-  linkBtnText: { fontSize: 11, fontWeight: '800', color: '#0077b5' },
-  linkBtnGray: { backgroundColor: colors.bg3, borderColor: colors.border2 },
-  linkBtnGrayText: { fontSize: 12, color: colors.t2 },
 
   divisionGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   divisionTile: {
-    width: '47.5%',
-    backgroundColor: colors.bg2,
-    borderWidth: 1,
-    borderRadius: 14,
-    padding: 14,
-    gap: 4,
+    width: '47.5%', borderWidth: 1, borderRadius: 14, padding: 14, gap: 4,
+    shadowColor: '#0b1120', shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04, shadowRadius: 4, elevation: 1,
   },
   divisionDot: { width: 10, height: 10, borderRadius: 5, marginBottom: 4 },
-  divisionName: { fontSize: 12, fontWeight: '800', color: colors.t1 },
+  divisionName: { fontSize: 12, fontWeight: '800' },
   divisionVPRow: { flexDirection: 'row' },
   vpBadge: { borderWidth: 1, borderRadius: 999, paddingHorizontal: 6, paddingVertical: 2 },
   vpBadgeText: { fontSize: 8, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5 },
-  divisionVP: { fontSize: 11, color: colors.t3 },
-  divisionCount: { fontSize: 10, color: colors.t4, marginTop: 2 },
+  divisionVP: { fontSize: 11, fontFamily: 'Geist-Regular' },
+  divisionCount: { fontSize: 10, fontFamily: 'Geist-Regular', marginTop: 2 },
 
-  membersPanel: {
-    borderWidth: 1,
-    borderRadius: 14,
-    overflow: 'hidden',
-  },
+  membersPanel: { borderWidth: 1, borderRadius: 14, overflow: 'hidden' },
   membersPanelHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    gap: 8,
-    borderBottomWidth: 1,
+    flexDirection: 'row', alignItems: 'center',
+    paddingHorizontal: 14, paddingVertical: 10, gap: 8, borderBottomWidth: 1,
   },
   panelDot: { width: 8, height: 8, borderRadius: 4 },
-  panelTitle: { fontSize: 13, fontWeight: '800', color: colors.t1, flex: 1 },
-  panelCount: { fontSize: 11, color: colors.t4 },
+  panelTitle: { fontSize: 13, fontWeight: '800', flex: 1 },
+  panelCount: { fontSize: 11 },
   membersList: { padding: 10, gap: 8 },
   memberCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.bg3,
-    borderWidth: 1,
-    borderRadius: 12,
-    padding: 10,
-    gap: 10,
+    flexDirection: 'row', alignItems: 'center',
+    borderWidth: 1, borderRadius: 12, padding: 10, gap: 10,
   },
 
-  footerBlock: { flexDirection: 'row', flexWrap: 'wrap', borderTopWidth: 1, borderTopColor: colors.border1, paddingTop: 16 },
-  footerText: { fontSize: 12, color: colors.t4 },
-  footerLink: { fontSize: 12, color: colors.accent },
+  footerBlock: { flexDirection: 'row', flexWrap: 'wrap', borderTopWidth: 1, paddingTop: 16 },
+  footerText: { fontSize: 12, fontFamily: 'Geist-Regular' },
+  footerLink: { fontSize: 12, fontFamily: 'Geist-Medium' },
 })
