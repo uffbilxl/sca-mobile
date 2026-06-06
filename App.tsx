@@ -1,12 +1,12 @@
-import { useState } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { NavigationContainer } from '@react-navigation/native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import { StatusBar, Text, View, TouchableOpacity, StyleSheet, ScrollView, Switch } from 'react-native'
+import { StatusBar, Text, View, TouchableOpacity, StyleSheet, ScrollView, Switch, Animated } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { useFonts } from 'expo-font'
 import { House, Briefcase, Star, Calendar, Ellipsis, ChevronRight, Users, FileText, Info, Sun, Moon } from 'lucide-react-native'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useFocusEffect } from '@react-navigation/native'
 import { ThemeProvider, useTheme } from './lib/ThemeContext'
 import SplashScreen from './components/SplashScreen'
 import AppHeader from './components/AppHeader'
@@ -21,6 +21,28 @@ import AboutScreen from './screens/AboutScreen'
 
 const Tab = createBottomTabNavigator()
 const MoreStack = createNativeStackNavigator()
+
+function withFade<P extends object>(Component: React.ComponentType<P>) {
+  return function FadedScreen(props: P) {
+    const opacity = useRef(new Animated.Value(0)).current
+    const translateY = useRef(new Animated.Value(10)).current
+    useFocusEffect(
+      useCallback(() => {
+        opacity.setValue(0)
+        translateY.setValue(10)
+        Animated.parallel([
+          Animated.timing(opacity,     { toValue: 1, duration: 240, useNativeDriver: false }),
+          Animated.timing(translateY,  { toValue: 0, duration: 240, useNativeDriver: false }),
+        ]).start()
+      }, [])
+    )
+    return (
+      <Animated.View style={{ flex: 1, opacity, transform: [{ translateY }] }}>
+        <Component {...(props as any)} />
+      </Animated.View>
+    )
+  }
+}
 
 const TAB_ICONS: Record<string, any> = {
   Home:          House,
@@ -128,6 +150,8 @@ function MoreStackNavigator() {
       screenOptions={{
         headerShown: false,
         contentStyle: { backgroundColor: c.bgPage },
+        animation: 'slide_from_right',
+        animationDuration: 280,
       }}
     >
       <MoreStack.Screen name="MoreHome" component={MoreHomeScreen} />
@@ -178,10 +202,10 @@ function ThemedApp() {
             tabBarLabelStyle: { fontSize: 10, fontFamily: 'Geist-Medium' } as any,
           })}
         >
-          <Tab.Screen name="Home" component={HomeScreen} options={{ title: 'Home' }} />
-          <Tab.Screen name="Opportunities" component={OpportunitiesScreen} />
-          <Tab.Screen name="Events" component={EventsScreen} />
-          <Tab.Screen name="SCA" component={SCAScreen} options={{ title: 'SCA Roles' }} />
+          <Tab.Screen name="Home" component={withFade(HomeScreen)} options={{ title: 'Home' }} />
+          <Tab.Screen name="Opportunities" component={withFade(OpportunitiesScreen)} />
+          <Tab.Screen name="Events" component={withFade(EventsScreen)} />
+          <Tab.Screen name="SCA" component={withFade(SCAScreen)} options={{ title: 'SCA Roles' }} />
           <Tab.Screen name="More" component={MoreStackNavigator} options={{ headerShown: false }} />
         </Tab.Navigator>
       </NavigationContainer>
