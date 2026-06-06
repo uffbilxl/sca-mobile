@@ -1,0 +1,320 @@
+# BCUSCA Mobile App — Master Development Prompt
+
+> **Target platforms:** iOS (App Store) & Android (Google Play)
+> **Source website:** [bcusca.org](https://bcusca.org)
+> **Framework recommendation:** React Native (Expo) for cross-platform parity
+
+---
+
+## 1. Project Overview
+
+Build a **pixel-faithful mobile application** of the BCU Student Computing Association website (bcusca.org) for release on the **Apple App Store** and **Google Play Store**. Every screen, section, piece of content, navigation item, and interaction must mirror the live website exactly — no content additions, no content removals, no layout deviations — with one deliberate exception: a **professional animated splash screen** shown on cold launch before the home screen appears.
+
+This app is built by BCU students, for BCU students. It must feel native, fast, and polished across both platforms.
+
+---
+
+## 2. Typography — Match the Website Exactly
+
+The website uses **Geist Sans** by Vercel, loaded via `next/font/google`. This must be the font used throughout the entire app, including the splash screen.
+
+- **Primary font:** Geist Sans (variable font, weights 100–900)
+- **Monospace font:** Geist Mono (for any code or terminal-style text)
+- **Install in React Native:** Use `expo-font` with self-hosted Geist font files from https://github.com/vercel/geist-font/releases
+- **Fallback stack:** `'Geist', system-ui, -apple-system, sans-serif`
+
+### Font weight usage (match site exactly)
+| Context | Weight |
+|---|---|
+| Hero heading "Your BCU Computing" | 700 (Bold) |
+| Hero sub-heading "Community & Career Hub" | 400–500 |
+| Section headings | 600 (SemiBold) |
+| Sub-labels ("HANDPICKED", "01") | 400, uppercase, tracked |
+| Body copy | 400 (Regular) |
+| Navigation items | 500 (Medium) |
+| Badges (Featured, Hybrid, etc.) | 500, small |
+| CTA button text | 600 |
+
+### Geist font setup in Expo
+```javascript
+// app/_layout.tsx
+import { useFonts } from 'expo-font';
+
+const [fontsLoaded] = useFonts({
+  'Geist-Light':    require('../assets/fonts/Geist-Light.ttf'),
+  'Geist-Regular':  require('../assets/fonts/Geist-Regular.ttf'),
+  'Geist-Medium':   require('../assets/fonts/Geist-Medium.ttf'),
+  'Geist-SemiBold': require('../assets/fonts/Geist-SemiBold.ttf'),
+  'Geist-Bold':     require('../assets/fonts/Geist-Bold.ttf'),
+});
+```
+
+---
+
+## 3. Colour Scheme — Match the Website Exactly
+
+The website uses a **dark navy theme** with ambient purple and teal glow effects in the hero, a blue primary CTA, teal/cyan "Featured" badges, and dark card surfaces. All colours below are extracted directly from the live site.
+
+### Core colour tokens
+| Token | Hex | Usage |
+|---|---|---|
+| `--color-bg-base` | `#0d1117` | Main page background (deepest dark navy) |
+| `--color-bg-nav` | `#161b22` | Navigation bar, slightly lighter dark |
+| `--color-bg-card` | `#161b22` | Opportunity cards, surface elements |
+| `--color-bg-card-border` | `#30363d` | Card borders, dividers |
+| `--color-bg-hero` | `#0f1218` | Hero section base colour |
+| `--color-text-primary` | `#ffffff` | Main headings, primary text |
+| `--color-text-secondary` | `#8b949e` | Subtext, muted labels, metadata |
+| `--color-text-accent` | `#e6edf3` | Body copy, slightly off-white |
+| `--color-cta-primary` | `#4f8ef7` | "Explore Opportunities" button fill |
+| `--color-cta-primary-hover` | `#6ba3f8` | CTA button hover state |
+| `--color-cta-secondary-border` | `#30363d` | "Upcoming Events" outline button border |
+| `--color-badge-featured` | `#1f6feb` | "Featured" badge background (blue) |
+| `--color-badge-featured-text` | `#58a6ff` | "Featured" badge text |
+| `--color-badge-teal` | `#0d4a3a` | Teal variant badge bg |
+| `--color-badge-teal-text` | `#3fb68b` | Teal variant badge text |
+| `--color-label-muted` | `#6e7681` | "HANDPICKED" uppercase labels |
+| `--color-ticker-text` | `#8b949e` | Ticker strip default company text |
+| `--color-ticker-blue` | `#58a6ff` | Highlighted ticker company names (Microsoft, Quantinuum, etc.) |
+| `--color-pill-border` | `#30363d` | Badge/pill border |
+| `--color-dot-green` | `#3fb68b` | Green dot in BCU pill label |
+
+### Hero ambient glow (critical — must be reproduced)
+The hero section has two large radial ambient glow blobs:
+- **Teal glow:** bottom-left — `radial-gradient(ellipse at 15% 85%, rgba(13,110,89,0.35) 0%, transparent 60%)`
+- **Purple glow:** bottom-right — `radial-gradient(ellipse at 85% 80%, rgba(88,28,135,0.4) 0%, transparent 55%)`
+- These sit on top of the base hero background `#0f1218`
+- In React Native: use `expo-linear-gradient` with absolute-positioned gradient layers, or a pre-rendered PNG background image
+
+### Navigation bar
+- Background: `#161b22` with a bottom border `1px solid #21262d`
+- Active tab highlight: pill/rounded background `#21262d`, text white
+- Inactive tab text: `#8b949e`
+- "Join SCA" button: filled blue `#4f8ef7`, white text, rounded
+
+### Opportunity cards
+- Background: `#161b22`
+- Border: `1px solid #30363d`
+- Border radius: `12px`
+- "Featured" badge: top-right, blue background `#1f2d4e`, text `#58a6ff`, `11px` Geist 500
+- Company name: `#8b949e`, `13px`
+- Role title: `#e6edf3`, `15px`, weight 500
+- Location & work type: `#8b949e`, `12px`, with a pin icon
+- "Apply" button: outlined, border `#30363d`, text white
+
+---
+
+## 4. Splash Screen Specification
+
+The splash screen is the **only intentional difference** from the website. It uses the **exact same font (Geist Sans) and colour scheme (dark navy + teal/purple glows)** as the site.
+
+### Purpose
+The splash screen exists solely to greet the user on cold launch. It contains **no buttons, no navigation, no interactive elements of any kind**. It displays, then automatically transitions to the Home screen. The user does nothing — it just plays and moves on.
+
+### Design
+- **Background:** Deep navy `#0d1117` — same as site base background
+- **Ambient glows:** Teal glow (bottom-left) + purple glow (bottom-right) — matching the hero section exactly
+- **Font:** Geist Sans throughout — same as the entire website
+- **Logo:** SCA logo (`https://bcusca.org/sca-logo.png`) centred, scales in from 85%→100% with fade over 600ms
+- **BCU pill:** Small pill label "BIRMINGHAM CITY UNIVERSITY · STUDENT COMPUTING ASSOCIATION" — matching the exact pill on the website hero (border `#30363d`, green dot `#3fb68b`, text `#8b949e`, Geist 400)
+- **Main heading:** "Student Computing Association" — Geist Bold 700, white `#ffffff`
+- **Tagline:** `"From your first lecture to your first offer."` — Geist Light 300, `rgba(255,255,255,0.45)`, italic
+- **Ticker strip:** Company names scrolling at bottom at ~20% opacity — ambient decoration only, text `rgba(139,148,158,0.35)`
+- **No buttons. No CTAs. No tappable elements.** The screen is purely visual.
+- **No gold, no purple text, no other accent** — all colour comes from the background glows only
+
+### Animation sequence
+| Time | Event |
+|---|---|
+| 0ms | Dark navy screen + ambient glows present immediately |
+| 100ms | Logo scales + fades in (600ms duration) |
+| 700ms | BCU pill fades up |
+| 950ms | "Student Computing Association" heading fades up |
+| 1200ms | Tagline fades up |
+| 0ms (bg) | Ticker scrolling begins immediately |
+| 2800ms | All elements fade out to `#0d1117` |
+| 3100ms | Crossfade into Home screen |
+
+### Platform compliance
+- **iOS:** Safe Area Insets respected. `LaunchScreen.storyboard` background = `#0d1117`. Centred SCA logo as launch image.
+- **Android:** `windowSplashScreenBackground` = `#0d1117`. Custom animated splash activity overlaid immediately after system splash. Glows rendered via Canvas or pre-baked PNG.
+- **Both:** Splash does NOT replay on app resume — cold launch only.
+
+---
+
+## 5. App Store & Google Play Requirements
+
+### App Identity
+- **App name:** BCUSCA — Student Computing Association
+- **Bundle ID (iOS):** `org.bcusca.app`
+- **Package name (Android):** `org.bcusca.app`
+- **Version:** 1.0.0
+- **Category:** Education
+- **Age rating:** 4+ / Everyone
+
+### App Store (iOS) Specifics
+- Minimum iOS version: **16.0**
+- App Icon: 1024×1024px PNG — SCA logo centred on `#0d1117` dark navy background
+- Launch Screen: storyboard-based, `#0d1117` background with centred logo
+- Screenshot sizes: 6.9" (iPhone 16 Pro Max), 6.5" (iPhone 14 Plus), 5.5" (iPhone 8 Plus), 12.9" iPad Pro
+- Privacy: no user data collected → Privacy Nutrition Label = "No Data Collected"
+
+### Google Play (Android) Specifics
+- Minimum SDK: **API 26 (Android 8.0)**
+- Target SDK: latest stable (API 35+)
+- Adaptive Icon: SCA logo foreground + `#0d1117` background layer
+- Screenshot sizes: Phone (1080×1920), 7" tablet, 10" tablet
+- Privacy Policy URL required — use bcusca.org/privacy or hosted policy page
+- Content rating: Education, Everyone
+
+---
+
+## 6. Navigation Structure
+
+Mirror the website navigation exactly. Implement as a **bottom tab bar** for mobile:
+
+| Tab | Icon | Maps to |
+|---|---|---|
+| Home | house | bcusca.org/ |
+| Opportunities | briefcase | bcusca.org/opportunities |
+| SCA Opps | star | bcusca.org/sca-opportunities |
+| Events | calendar | bcusca.org/events |
+| Committee | users | bcusca.org/committee |
+| Resources | book | bcusca.org/resources |
+| About | info-circle | bcusca.org/about |
+
+> Consider grouping "SCA Opps" under Opportunities as a filter, and "About" + "Committee" under a "More" tab. **Do not remove any content.**
+
+### Tab bar styling
+- Background: `#161b22`, top border `1px solid #21262d`
+- Active: white text + icon, pill highlight `#21262d`
+- Inactive: `#8b949e` text + icon
+- Font: Geist 500, 11px
+
+### Header buttons
+- "Report an Issue" → mailto
+- "Join the Committee" → Tally form (`https://tally.so/r/681g7e`)
+- "Join SCA" → blue filled button → LinkedIn page
+
+---
+
+## 7. Screen-by-Screen Content Requirements
+
+### 7.1 Home Screen
+- **Hero section:** `#0f1218` base + teal/purple ambient glows
+- BCU pill label (green dot + text), exact as website
+- H1: "Your BCU Computing Community & Career Hub" — Geist Bold
+- Subtext + disclaimer verbatim
+- Two CTA buttons: blue filled + dark outlined
+- Ticker strip: all company names, infinite scroll
+- Featured Opportunities: 6 dark cards
+- "Where do you want to start?" grid
+- "What the SCA offers" numbered section (01, 02, 03)
+- "You belong here" CTA section
+
+### 7.2–7.7 Remaining Screens
+- Opportunities, SCA Opportunities, Events, Committee, Resources, About
+- All content identical to bcusca.org pages
+- All use the same dark navy colour scheme (`#0d1117` base, `#161b22` cards)
+
+---
+
+## 8. Design System Summary
+
+```
+TYPOGRAPHY
+--font:            'Geist', system-ui, sans-serif
+--font-mono:       'Geist Mono', monospace
+
+BACKGROUNDS
+--bg-base:         #0d1117   (page background)
+--bg-nav:          #161b22   (nav bar, cards)
+--bg-elevated:     #21262d   (hover states, active pills)
+
+TEXT
+--text-primary:    #ffffff
+--text-secondary:  #8b949e
+--text-body:       #e6edf3
+
+BORDERS
+--border:          #30363d
+--border-subtle:   #21262d
+
+ACCENT
+--blue-primary:    #4f8ef7   (CTA button)
+--blue-text:       #58a6ff   (links, badges)
+--teal-text:       #3fb68b   (green dot, teal badges)
+
+GLOWS (hero only)
+--glow-teal:       rgba(13,110,89,0.35)   bottom-left
+--glow-purple:     rgba(88,28,135,0.4)    bottom-right
+```
+
+---
+
+## 9. Technical Architecture
+
+- **Framework:** React Native with Expo SDK (latest stable)
+- **Navigation:** Expo Router (file-based, tab + stack)
+- **Font:** `expo-font` + self-hosted Geist `.ttf` files
+- **Gradients:** `expo-linear-gradient` for hero glow backgrounds
+- **Splash:** `expo-splash-screen` + custom `SplashScreen.tsx`
+- **External links:** `expo-web-browser`
+- **Data:** Static JSON seeded from bcusca.org content at build time
+
+---
+
+## 10. Content Parity Checklist
+
+- [ ] All 7 sections match live site content exactly
+- [ ] All 6 featured opportunity cards correct
+- [ ] Ticker strip contains all company names in correct order
+- [ ] Font is Geist Sans throughout — splash screen included
+- [ ] Hero section has teal + purple ambient glow — matches site exactly
+- [ ] All colour tokens match extracted values above
+- [ ] "Explore Opportunities" button is blue `#4f8ef7`
+- [ ] Card backgrounds `#161b22`, borders `#30363d`
+- [ ] Splash plays on cold launch only — not on resume
+- [ ] Disclaimer text verbatim
+- [ ] Footer: © 2026 SCA BCU + Keystone credit
+- [ ] Tested on iOS 16+ and Android 8+ physical devices
+
+---
+
+## 11. App Store Submission Checklist
+
+### Apple App Store
+- [ ] Apple Developer account (£99/year)
+- [ ] App ID registered in Developer portal
+- [ ] `eas build --platform ios --profile production`
+- [ ] Uploaded to App Store Connect via EAS Submit
+- [ ] Store listing: description, keywords, screenshots, support URL
+- [ ] Privacy policy URL provided
+- [ ] TestFlight internal testing passed
+
+### Google Play Store
+- [ ] Google Play Developer account ($25 one-time)
+- [ ] Upload keystore generated and securely stored (never commit to git)
+- [ ] `eas build --platform android --profile production`
+- [ ] AAB uploaded to Play Console
+- [ ] Store listing completed + content rating questionnaire
+- [ ] Privacy policy URL provided
+- [ ] Internal → Closed → Production rollout
+
+---
+
+## 12. Constraints & Non-Negotiables
+
+1. **Font is Geist Sans only** — no substitutions anywhere
+2. **Colour scheme matches bcusca.org exactly** — dark navy base, teal/purple ambient glows, blue CTA
+3. **No content differences from the live site**
+4. **Splash screen is the only addition** — no login walls, no extra features
+5. **Disclaimer verbatim:** "Not linked or affiliated in any way, shape, or form with BCUSU, BCU Computer Science Society, or BCU Cyber Security Society."
+6. **Attribution preserved:** "Made by Keystone" credit in About section
+7. **Both platforms ship simultaneously**
+8. **Both stores' review policies must be met**
+
+---
+
+*Reference site: bcusca.org · Font: Geist Sans (Vercel) · Theme: dark navy with teal/purple ambient glows*
+*Contact: tayyeb.nadeemsomro@mail.bcu.ac.uk / bilal.arshad2@mail.bcu.ac.uk*

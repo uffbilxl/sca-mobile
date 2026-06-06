@@ -1,0 +1,252 @@
+# BCUSCA Mobile App — Master Development Prompt
+
+> **Target platforms:** iOS (App Store) & Android (Google Play)
+> **Source website:** [bcusca.org](https://bcusca.org)
+> **Framework recommendation:** React Native (Expo) for cross-platform parity
+
+---
+
+## 1. Project Overview
+
+Build a **pixel-faithful mobile application** of the BCU Student Computing Association website (bcusca.org) for release on the **Apple App Store** and **Google Play Store**. Every screen, section, piece of content, navigation item, and interaction must mirror the live website exactly — no content additions, no content removals, no layout deviations — with one deliberate exception: a **professional animated splash screen** shown on cold launch before the home screen appears.
+
+This app is built by BCU students, for BCU students. It must feel native, fast, and polished across both platforms.
+
+---
+
+## 2. Splash Screen Specification
+
+The splash screen is the **only intentional difference** from the website. It must be:
+
+- **Duration:** 2.8–3.2 seconds total, then auto-dismiss into the Home screen
+- **Background:** Deep navy — `#0A1628`
+- **Logo treatment:** The SCA logo (`https://bcusca.org/sca-logo.png`) centred, scaling up from 0→100% with a subtle fade-in over 600ms
+- **Tagline animation:** "From your first lecture to your first offer." fades in below the logo at 800ms, letter-by-letter or word-by-word stagger
+- **Ticker strip:** The company ticker from the website (Google · Amazon · Apple · Microsoft · Cloudflare · etc.) scrolls horizontally across the bottom third of the screen at low opacity (~25%) as ambient decoration
+- **Exit transition:** Whole screen fades out smoothly (300ms) into the Home screen — no hard cut
+- **Brand colours used:** Navy `#0A1628` background, white `#FFFFFF` logo/text, BCU gold accent `#F5A623` for a subtle animated underline or dot beneath the logo
+- **Platform compliance:**
+  - iOS: Respects Safe Area Insets, no content behind notch/Dynamic Island
+  - Android: Implements SplashScreen API (`expo-splash-screen` or `androidx.core.splashscreen`) to prevent blank white flash on cold start
+  - Both: Must be declared as the launch screen in `app.json` / `AndroidManifest.xml` / `LaunchScreen.storyboard`
+
+---
+
+## 3. App Store & Google Play Requirements
+
+### App Identity
+- **App name:** BCUSCA — Student Computing Association
+- **Bundle ID (iOS):** `org.bcusca.app`
+- **Package name (Android):** `org.bcusca.app`
+- **Version:** 1.0.0
+- **Category:** Education
+- **Age rating:** 4+ / Everyone
+
+### App Store (iOS) Specifics
+- Minimum iOS version: **16.0**
+- Requires `NSAppTransportSecurity` configured for bcusca.org web content
+- App Icon: 1024×1024px PNG (no alpha), derived from SCA logo on navy background
+- Launch Screen: storyboard-based, centred logo on navy — matches splash animation start frame
+- Screenshot sizes needed: 6.9" (iPhone 16 Pro Max), 6.5" (iPhone 14 Plus), 5.5" (iPhone 8 Plus), 12.9" iPad Pro
+- Privacy: no user data collected → Privacy Nutrition Label = "No Data Collected"
+- `Info.plist` usage descriptions required only if push notifications or camera added later
+
+### Google Play (Android) Specifics
+- Minimum SDK: **API 26 (Android 8.0)**
+- Target SDK: latest stable (API 35+)
+- App Icon: Adaptive Icon — foreground layer (SCA logo) + navy background layer
+- Splash via `androidx.core.splashscreen` with `windowSplashScreenBackground` = `#0A1628`
+- Screenshot sizes: Phone (1080×1920), 7" tablet, 10" tablet
+- Privacy Policy URL required (even if no data collected) — use bcusca.org/privacy or a hosted policy page
+- Content rating questionnaire: Education, no violence/mature content → Everyone
+
+---
+
+## 4. Navigation Structure
+
+Mirror the website navigation exactly. Implement as a **bottom tab bar** (mobile convention) mapped to the top nav of the site:
+
+| Tab Label | Icon | Maps to Website Page |
+|---|---|---|
+| Home | house | bcusca.org/ |
+| Opportunities | briefcase | bcusca.org/opportunities |
+| SCA Opps | star | bcusca.org/sca-opportunities |
+| Events | calendar | bcusca.org/events |
+| Committee | users | bcusca.org/committee |
+| Resources | book | bcusca.org/resources |
+| About | info-circle | bcusca.org/about |
+
+> Seven tabs may exceed mobile tab bar best practice. Consider grouping "SCA Opps" under Opportunities as a filter/segment, and "About" + "Committee" under a "More" tab, then present sub-options as a list screen. **Do not remove any content** — just restructure navigation ergonomically for mobile.
+
+### Additional navigation items (from website header)
+- "Report an Issue" → in-app mailto link (`tayyeb.nadeemsomro@mail.bcu.ac.uk`)
+- "Join the Committee" → in-app webview or external LinkedIn link
+- "Join SCA" → opens LinkedIn company page (`https://www.linkedin.com/company/bcu-student-computing-association/`)
+
+---
+
+## 5. Screen-by-Screen Content Requirements
+
+Every screen below must match the live website content identically. Pull all copy, card data, and link destinations from bcusca.org at build time (or via a live fetch if the site exposes an API/CMS).
+
+### 5.1 Home Screen
+- Animated ticker strip (same companies as website): Google · Amazon · Apple · Cloudflare · Microsoft · Quantinuum · Arm · DRW · IBM · Accenture · Mastercard · Visa · TPP · G-Research — infinite horizontal scroll, same as site
+- Hero headline: "Your BCU Computing Community & Career Hub"
+- Hero subtext: "From your first year to landing your first role — events, resources, opportunities, and a community built for every BCU computing student."
+- Two CTA buttons: "Explore Opportunities" → Opportunities tab; "Upcoming Events" → Events tab
+- Disclaimer text: "Not linked or affiliated in any way, shape, or form with BCUSU, BCU Computer Science Society, or BCU Cyber Security Society."
+- Featured Opportunities section (6 cards, same as website): Accenture internship, DRW placement, Accenture grad scheme, Amazon internship, HP placement, Apple grad role — each card shows: company logo, company name, role title, location, work type badge (Hybrid/On-site), role type badge (Internship/Placement/Graduate), deadline, and "Apply" button
+- "Where do you want to start?" grid: 6 tiles linking to Opportunities, Events, Resources, Graduate Roles, Spring Weeks, Committee
+- "What the SCA offers" section: 3 numbered points (01, 02, 03) with title and body copy matching site
+- "You belong here" CTA section with two buttons
+
+### 5.2 Opportunities Screen
+- Filter controls matching site (type: Internship, Placement, Graduate, Spring Week)
+- Full listing of all opportunities with same card format as homepage featured cards
+- "View all →" / pagination matching site behaviour
+
+### 5.3 SCA Opportunities Screen
+- Content mirrors bcusca.org/sca-opportunities exactly
+
+### 5.4 Events Screen
+- Content mirrors bcusca.org/events exactly
+- Event cards: title, date, type, description, sign-up link
+
+### 5.5 Committee Screen
+- Content mirrors bcusca.org/committee exactly
+- Member cards: name, role, photo (if provided), contact
+
+### 5.6 Resources Screen
+- Content mirrors bcusca.org/resources exactly
+- CV templates, cover letter guides, peer insights — all downloadable or linkable
+
+### 5.7 About Screen
+- Content mirrors bcusca.org/about exactly
+
+---
+
+## 6. Design System
+
+Replicate the visual design of bcusca.org precisely.
+
+### Colours
+- Primary background: White `#FFFFFF`
+- Dark sections: Near-black (match site)
+- Accent / brand: Match site's existing colour usage exactly
+- Badge colours: Match site's Hybrid/On-site/Internship/Placement/Graduate badge colours
+
+### Typography
+- Match the site's font stack as closely as possible using system fonts or Google Fonts equivalents
+- Font weights, sizes, and line-heights must match the site's rendered output
+
+### Components
+- Opportunity card: identical layout to site cards
+- Ticker/marquee strip: same companies, same speed, infinite loop
+- Section headers with "Handpicked" / "Everything we offer" labelling style
+- Numbered feature list (01, 02, 03 format)
+- Footer: "© 2026 SCA BCU", bug report links, "Made by Keystone" credit
+
+### Spacing & Layout
+- Translate the site's section padding into mobile-appropriate equivalents
+- Maintain visual hierarchy — do not collapse or reorder sections
+
+---
+
+## 7. Technical Architecture
+
+### Recommended Stack
+- **Framework:** React Native with Expo SDK (latest stable)
+- **Navigation:** Expo Router (file-based, tab + stack)
+- **Splash screen:** `expo-splash-screen` with custom animated component
+- **Web content:** `expo-web-browser` for external links; `WebView` only if full-page embeds needed
+- **Data:** Static JSON seeded from bcusca.org content at build time, or fetch from site at runtime
+- **Icons:** Use Expo vector icons (Ionicons / Feather) to match Tabler-style outline icons from the site
+
+### File Structure (suggested)
+```
+app/
+  (tabs)/
+    index.tsx          ← Home
+    opportunities.tsx
+    sca-opportunities.tsx
+    events.tsx
+    committee.tsx
+    resources.tsx
+    about.tsx
+  _layout.tsx          ← Tab bar config
+components/
+  SplashScreen.tsx
+  OpportunityCard.tsx
+  TickerStrip.tsx
+  SectionHeader.tsx
+assets/
+  sca-logo.png
+  company-logos/
+constants/
+  colours.ts
+  typography.ts
+  opportunities.ts     ← seeded data
+```
+
+### Platform-specific files
+- `app.json` — Expo config with splash, icon, bundle IDs, permissions
+- `ios/` — LaunchScreen.storyboard, Info.plist
+- `android/` — adaptive icon layers, splash theme in styles.xml
+
+---
+
+## 8. Content Parity Checklist
+
+Before submission to either store, verify:
+
+- [ ] All 7 nav sections have matching content to live site
+- [ ] All 6 featured opportunity cards present with correct data
+- [ ] Ticker strip contains all company names in correct order
+- [ ] All external links open correctly (LinkedIn, Apply buttons, mailto)
+- [ ] Splash screen plays on cold launch on both platforms
+- [ ] Splash screen does NOT replay on app resume / background → foreground
+- [ ] Disclaimer text present on Home screen
+- [ ] Footer credits present (© 2026 SCA BCU, Keystone credit)
+- [ ] Bug report email links functional
+- [ ] App tested on iOS 16+ and Android 8+ physical devices
+- [ ] App tested on smallest and largest supported screen sizes
+- [ ] Dark mode respected (if site has dark sections, match them)
+- [ ] Accessibility: minimum tap target 44×44pt, adequate colour contrast
+
+---
+
+## 9. App Store Submission Checklist
+
+### Apple App Store
+- [ ] Apple Developer account active (£99/year)
+- [ ] App ID registered in Apple Developer portal
+- [ ] Distribution certificate + provisioning profile created
+- [ ] App built with `eas build --platform ios --profile production`
+- [ ] Uploaded to App Store Connect via EAS Submit or Transporter
+- [ ] App Store listing completed: description, keywords, screenshots, support URL
+- [ ] Privacy policy URL provided
+- [ ] TestFlight internal testing passed before public submission
+
+### Google Play Store
+- [ ] Google Play Developer account active (one-time $25)
+- [ ] App signed with upload keystore (store securely — never commit to git)
+- [ ] App built with `eas build --platform android --profile production`
+- [ ] AAB (Android App Bundle) uploaded to Play Console
+- [ ] Store listing completed: description, screenshots, content rating questionnaire
+- [ ] Privacy policy URL provided
+- [ ] Internal testing track → Closed testing → Production rollout
+
+---
+
+## 10. Constraints & Non-Negotiables
+
+1. **No content differences from bcusca.org** — if it's on the site, it's in the app. If it's not on the site, it's not in the app.
+2. **Splash screen is the only addition** — no extra features, no login walls, no push notification prompts at launch.
+3. **No affiliation branding changes** — the disclaimer about BCUSU/CS Society/Cyber Security Society must remain verbatim.
+4. **Attribution preserved** — "Made by Keystone" footer credit must appear in the app's About section or equivalent.
+5. **Both platforms ship simultaneously** — iOS and Android must reach stores in the same release cycle.
+6. **App must pass App Store Review Guidelines** and **Google Play Developer Program Policies** — no dark patterns, no misleading metadata.
+
+---
+
+*This prompt was generated for the BCUSCA app project. Reference site: bcusca.org. For questions contact the SCA committee via the bug report emails listed on the site.*

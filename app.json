@@ -5,17 +5,15 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
-    "web": {
-      "bundler": "metro",
-      "output": "single"
-    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "org.bcusca.app"
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#090909"
-      }
+        "backgroundColor": "#0d1117"
+      },
+      "package": "org.bcusca.app"
     }
   }
 }
