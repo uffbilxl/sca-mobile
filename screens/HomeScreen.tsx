@@ -1,10 +1,11 @@
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState, useCallback } from 'react'
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Linking, Animated, Platform } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useFocusEffect } from '@react-navigation/native'
 import { typeColors, typeLabels, teal } from '../lib/theme'
 import { useTheme } from '../lib/ThemeContext'
-import { OPPORTUNITIES } from '../lib/data'
+import { fetchOpportunities } from '../lib/api'
+import type { Opportunity } from '../lib/types'
 import TickerBanner from '../components/TickerBanner'
 import AppHeader from '../components/AppHeader'
 import AnimatedBackground from '../components/AnimatedBackground'
@@ -39,7 +40,7 @@ function PulseDot() {
   return <Animated.View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: teal, opacity }} />
 }
 
-function FeaturedCard({ opp, onPress, c }: { opp: typeof OPPORTUNITIES[0]; onPress: () => void; c: any }) {
+function FeaturedCard({ opp, onPress, c }: { opp: Opportunity; onPress: () => void; c: any }) {
   const tInfo = typeColors[opp.type]
   const badgeBg  = tInfo ? c[tInfo.bg]   : c.blueLight
   const badgeText = tInfo ? c[tInfo.text] : c.blueText
@@ -63,8 +64,17 @@ export default function HomeScreen() {
   const navigation = useNavigation<any>()
   const insets = useSafeAreaInsets()
   const { colors: c } = useTheme()
+  const [opps, setOpps] = useState<Opportunity[]>([])
 
-  const openOpps = OPPORTUNITIES.filter(o => o.status !== 'CLOSED')
+  useFocusEffect(useCallback(() => {
+    let active = true
+    fetchOpportunities().then(({ data }) => {
+      if (active) setOpps(data)
+    })
+    return () => { active = false }
+  }, []))
+
+  const openOpps = opps.filter(o => o.status !== 'CLOSED')
   const totalOpen = openOpps.length
   const types = ['INTERNSHIP', 'PLACEMENT', 'GRADUATE', 'SPRING_WEEK'] as const
   const perType = types.map(t => openOpps.filter(o => o.featured && o.type === t).slice(0, 2))
