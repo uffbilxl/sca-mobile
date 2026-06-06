@@ -9,8 +9,23 @@ function toDate(v: any): Date | null {
   return isNaN(d.getTime()) ? null : d
 }
 
+function parseTags(raw: any): string[] {
+  if (!Array.isArray(raw)) return []
+  return raw.map((t: any) => {
+    if (typeof t === 'string') return t
+    if (t?.tag?.name) return t.tag.name
+    if (t?.name) return t.name
+    return String(t)
+  })
+}
+
 function parseOpportunity(o: any): Opportunity {
-  return { ...o, deadline: toDate(o.deadline), createdAt: toDate(o.createdAt) ?? new Date(0) }
+  return {
+    ...o,
+    deadline: toDate(o.deadline),
+    createdAt: toDate(o.createdAt) ?? new Date(0),
+    tags: parseTags(o.tags),
+  }
 }
 
 function parseEvent(e: any): SCAEvent {
