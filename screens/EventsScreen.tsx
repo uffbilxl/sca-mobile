@@ -4,26 +4,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { MapPin, Wifi, Clock, Calendar } from 'lucide-react-native'
 import { useTheme } from '../lib/ThemeContext'
 import type { SCAEvent } from '../lib/types'
+import { fetchEvents, STATIC_EVENTS } from '../lib/api'
 import AppHeader from '../components/AppHeader'
 import AnimatedBackground from '../components/AnimatedBackground'
 
 const nd = Platform.OS !== 'web'
-
-const EVENTS: SCAEvent[] = [
-  {
-    id: 'social-night-june-2026',
-    title: 'Social Night: Debate & Gaming',
-    description: 'A collaborative social night with BCU Gaming Society and the Law Debating & Mooting Society. Speed debates on topics from Gaming and AI (12–3 PM), then a relaxed gaming session (3–8 PM).',
-    location: 'STEAMhouse, CST-302',
-    isOnline: false,
-    date: new Date('2026-06-04T12:00:00'),
-    endDate: new Date('2026-06-04T20:00:00'),
-    spots: null,
-    registrations: 0,
-    registrationUrl: null,
-    type: 'OTHER',
-  },
-]
 
 function pad(n: number) { return String(n).padStart(2, '0') }
 function formatDate(d: Date) {
@@ -76,9 +61,15 @@ function CountdownUnit({ value, label, c }: { value: number; label: string; c: a
 export default function EventsScreen() {
   const insets = useSafeAreaInsets()
   const { colors: c } = useTheme()
+  const [events, setEvents] = useState<SCAEvent[]>(STATIC_EVENTS)
+
+  useEffect(() => {
+    fetchEvents().then(setEvents)
+  }, [])
+
   const now = new Date()
-  const upcoming = EVENTS.filter(e => e.date >= now).sort((a, b) => +a.date - +b.date)
-  const past = EVENTS.filter(e => e.date < now).sort((a, b) => +b.date - +a.date)
+  const upcoming = events.filter(e => e.date >= now).sort((a, b) => +a.date - +b.date)
+  const past = events.filter(e => e.date < now).sort((a, b) => +b.date - +a.date)
   const [tab, setTab] = useState<'upcoming' | 'past'>('upcoming')
   const list = tab === 'upcoming' ? upcoming : past
   const nextEvent = upcoming[0] ?? null

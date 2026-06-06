@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import {
   View, Text, TextInput, ScrollView, TouchableOpacity, StyleSheet, FlatList, Linking,
   LayoutAnimation, Platform, UIManager,
@@ -8,7 +8,8 @@ import { MapPin, ChevronDown, ChevronUp, ListFilter } from 'lucide-react-native'
 import { useTheme } from '../lib/ThemeContext'
 import { typeColors, typeLabels } from '../lib/theme'
 import { OPPORTUNITIES } from '../lib/data'
-import type { OpportunityType } from '../lib/types'
+import { fetchOpportunities } from '../lib/api'
+import type { Opportunity, OpportunityType } from '../lib/types'
 import AppHeader from '../components/AppHeader'
 import AnimatedBackground from '../components/AnimatedBackground'
 
@@ -105,9 +106,14 @@ export default function OpportunitiesScreen() {
   const { colors: c } = useTheme()
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState<OpportunityType | 'ALL'>('ALL')
+  const [opps, setOpps] = useState<Opportunity[]>(OPPORTUNITIES)
+
+  useEffect(() => {
+    fetchOpportunities().then(setOpps)
+  }, [])
 
   const filtered = useMemo(() => {
-    return OPPORTUNITIES.filter(o => {
+    return opps.filter(o => {
       if (o.status === 'CLOSED') return false
       if (typeFilter !== 'ALL' && o.type !== typeFilter) return false
       if (search.trim()) {
