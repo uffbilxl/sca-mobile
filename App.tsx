@@ -24,20 +24,19 @@ const MoreStack = createNativeStackNavigator()
 
 function withFade<P extends object>(Component: React.ComponentType<P>) {
   return function FadedScreen(props: P) {
-    const opacity = useRef(new Animated.Value(0)).current
-    const translateY = useRef(new Animated.Value(10)).current
+    const translateY = useRef(new Animated.Value(6)).current
     useFocusEffect(
       useCallback(() => {
-        opacity.setValue(0)
-        translateY.setValue(10)
-        Animated.parallel([
-          Animated.timing(opacity,     { toValue: 1, duration: 240, useNativeDriver: false }),
-          Animated.timing(translateY,  { toValue: 0, duration: 240, useNativeDriver: false }),
-        ]).start()
+        translateY.setValue(6)
+        Animated.timing(translateY, {
+          toValue: 0,
+          duration: 220,
+          useNativeDriver: false,
+        }).start()
       }, [])
     )
     return (
-      <Animated.View style={{ flex: 1, opacity, transform: [{ translateY }] }}>
+      <Animated.View style={{ flex: 1, transform: [{ translateY }] }}>
         <Component {...(props as any)} />
       </Animated.View>
     )
