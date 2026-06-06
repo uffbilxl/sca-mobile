@@ -169,6 +169,11 @@ export default function CommitteeScreen() {
               >
                 <View style={[styles.divisionDot, { backgroundColor: div.color }]} />
                 <Text style={styles.divisionName}>{div.name}</Text>
+                <View style={styles.divisionVPRow}>
+                  <View style={[styles.vpBadge, { backgroundColor: `${div.color}18`, borderColor: `${div.color}35` }]}>
+                    <Text style={[styles.vpBadgeText, { color: div.color }]}>Vice President</Text>
+                  </View>
+                </View>
                 <Text style={styles.divisionVP}>{vp.name}</Text>
                 <Text style={styles.divisionCount}>{div.members.length - 1} member{div.members.length - 1 !== 1 ? 's' : ''}</Text>
               </TouchableOpacity>
@@ -278,6 +283,9 @@ const styles = StyleSheet.create({
   },
   divisionDot: { width: 10, height: 10, borderRadius: 5, marginBottom: 4 },
   divisionName: { fontSize: 12, fontWeight: '800', color: colors.t1 },
+  divisionVPRow: { flexDirection: 'row' },
+  vpBadge: { borderWidth: 1, borderRadius: 999, paddingHorizontal: 6, paddingVertical: 2 },
+  vpBadgeText: { fontSize: 8, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5 },
   divisionVP: { fontSize: 11, color: colors.t3 },
   divisionCount: { fontSize: 10, color: colors.t4, marginTop: 2 },
 
