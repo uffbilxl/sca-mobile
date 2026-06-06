@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Linking } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Linkedin, ExternalLink } from 'lucide-react-native'
+import { Link2, ExternalLink } from 'lucide-react-native'
 import { useTheme } from '../lib/ThemeContext'
 import AppHeader from '../components/AppHeader'
 
@@ -79,7 +79,7 @@ function MemberCard({ member, color, c }: { member: Member; color: string; c: an
             onPress={() => Linking.openURL(member.linkedin!)}
             accessibilityLabel="LinkedIn"
           >
-            <Linkedin size={13} color="#0077b5" strokeWidth={1.75} />
+            <Link2 size={13} color="#0077b5" strokeWidth={1.75} />
           </TouchableOpacity>
         )}
         {member.website && (
@@ -141,7 +141,7 @@ export default function CommitteeScreen() {
                   style={[styles.linkBtn, { backgroundColor: 'rgba(0,119,181,0.1)', borderColor: 'rgba(0,119,181,0.2)' }]}
                   onPress={() => Linking.openURL(LEADERSHIP[0].linkedin!)}
                 >
-                  <Linkedin size={13} color="#0077b5" strokeWidth={1.75} />
+                  <Link2 size={13} color="#0077b5" strokeWidth={1.75} />
                 </TouchableOpacity>
               )}
               {LEADERSHIP[0].website && (

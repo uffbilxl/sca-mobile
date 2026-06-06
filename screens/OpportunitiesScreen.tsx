@@ -4,7 +4,7 @@ import {
   LayoutAnimation, Platform, UIManager,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { MapPin, ChevronDown, ChevronUp } from 'lucide-react-native'
+import { MapPin, ChevronDown, ChevronUp, ListFilter } from 'lucide-react-native'
 import { useTheme } from '../lib/ThemeContext'
 import { typeColors, typeLabels } from '../lib/theme'
 import { OPPORTUNITIES } from '../lib/data'
@@ -136,34 +136,46 @@ export default function OpportunitiesScreen() {
         />
       </View>
 
-      {/* Type filter chips */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.filterScroll}
-        contentContainerStyle={styles.filterRow}
-      >
-        {TYPE_FILTERS.map(f => {
-          const active = typeFilter === f.value
-          const tInfo = f.value !== 'ALL' ? typeColors[f.value] : null
-          const activeBg   = active ? (tInfo ? c[tInfo.bg]   : c.blueLight) : c.bgInput
-          const activeText = active ? (tInfo ? c[tInfo.text]  : c.blue)     : c.textMuted
-          const activeBorder = active ? (tInfo ? c[tInfo.text] : c.blue) + '40' : c.border
-          return (
-            <TouchableOpacity
-              key={f.value}
-              style={[styles.filterChip, { backgroundColor: activeBg, borderColor: activeBorder }]}
-              onPress={() => setTypeFilter(f.value)}
-            >
-              <Text style={[styles.filterChipText, { color: activeText, fontWeight: active ? '700' : '500' }]}>
-                {f.label}
-              </Text>
-            </TouchableOpacity>
-          )
-        })}
-      </ScrollView>
+      {/* Type filter */}
+      <View style={[styles.filterWrap, { borderBottomColor: c.border }]}>
+        <View style={styles.filterLabelRow}>
+          <ListFilter size={13} color={c.textMuted} strokeWidth={1.75} />
+          <Text style={[styles.filterLabel, { color: c.textMuted }]}>Filter by type</Text>
+        </View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.filterRow}
+        >
+          {TYPE_FILTERS.map(f => {
+            const active = typeFilter === f.value
+            const tInfo = f.value !== 'ALL' ? typeColors[f.value] : null
+            const activeBg    = active ? (tInfo ? c[tInfo.bg]   : c.blue)        : 'transparent'
+            const activeText  = active ? (tInfo ? c[tInfo.text]  : '#fff')        : c.textPrimary
+            const activeBorder = active ? (tInfo ? c[tInfo.text] : c.blue)        : c.border
+            return (
+              <TouchableOpacity
+                key={f.value}
+                style={[
+                  styles.filterChip,
+                  { borderColor: activeBorder },
+                  active
+                    ? { backgroundColor: activeBg }
+                    : { backgroundColor: c.bgCard },
+                ]}
+                onPress={() => setTypeFilter(f.value)}
+                activeOpacity={0.75}
+              >
+                <Text style={[styles.filterChipText, { color: activeText }]}>
+                  {f.label}
+                </Text>
+              </TouchableOpacity>
+            )
+          })}
+        </ScrollView>
+      </View>
 
-      <Text style={[styles.count, { color: c.textMuted }]}>{filtered.length} opportunities</Text>
+      <Text style={[styles.count, { color: c.textMuted }]}>{filtered.length} {filtered.length === 1 ? 'opportunity' : 'opportunities'}</Text>
 
       <FlatList
         data={filtered}
@@ -189,16 +201,23 @@ const styles = StyleSheet.create({
     fontFamily: 'Geist-Regular',
   },
 
-  filterScroll: { flexGrow: 0 },
-  filterRow: { paddingLeft: 16, paddingRight: 8, paddingBottom: 10, flexDirection: 'row', alignItems: 'center' },
+  filterWrap: {
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    gap: 8,
+  },
+  filterLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 5 },
+  filterLabel: { fontSize: 10, fontFamily: 'Geist-Medium', letterSpacing: 0.8, textTransform: 'uppercase' },
+  filterRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   filterChip: {
     paddingHorizontal: 14,
     paddingVertical: 7,
-    borderRadius: 999,
+    borderRadius: 8,
     borderWidth: 1,
-    marginRight: 8,
   },
-  filterChipText: { fontSize: 12, fontFamily: 'Geist-Medium' },
+  filterChipText: { fontSize: 12, fontFamily: 'Geist-SemiBold' },
 
   count: { fontSize: 11, fontFamily: 'Geist-Regular', paddingHorizontal: 16, paddingBottom: 6 },
   list: { paddingHorizontal: 16, gap: 8 },

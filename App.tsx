@@ -5,7 +5,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { StatusBar, Text, View, TouchableOpacity, StyleSheet, ScrollView, Switch } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { useFonts } from 'expo-font'
-import { Home, Briefcase, Star, Calendar, MoreHorizontal, ChevronRight, Users, FileText, Info } from 'lucide-react-native'
+import { House, Briefcase, Star, Calendar, Ellipsis, ChevronRight, Users, FileText, Info, Sun, Moon } from 'lucide-react-native'
+import { useNavigation } from '@react-navigation/native'
 import { ThemeProvider, useTheme } from './lib/ThemeContext'
 import SplashScreen from './components/SplashScreen'
 import AppHeader from './components/AppHeader'
@@ -22,14 +23,12 @@ const Tab = createBottomTabNavigator()
 const MoreStack = createNativeStackNavigator()
 
 const TAB_ICONS: Record<string, any> = {
-  Home:          Home,
+  Home:          House,
   Opportunities: Briefcase,
   SCA:           Star,
   Events:        Calendar,
-  More:          MoreHorizontal,
+  More:          Ellipsis,
 }
-
-import { useNavigation } from '@react-navigation/native'
 
 function MoreHomeScreen() {
   const navigation = useNavigation<any>()
@@ -73,8 +72,8 @@ function MoreHomeScreen() {
         <View style={[moreStyles.card, moreStyles.cardRow, { backgroundColor: c.bgCard, borderColor: c.border }]}>
           <View style={[moreStyles.iconBox, { backgroundColor: c.bgInput }]}>
             {isDark
-              ? <Star size={18} color={c.textSecondary} strokeWidth={1.75} />
-              : <Star size={18} color={c.textSecondary} strokeWidth={1.75} />}
+              ? <Sun size={18} color={c.textSecondary} strokeWidth={1.75} />
+              : <Moon size={18} color={c.textSecondary} strokeWidth={1.75} />}
           </View>
           <Text style={[moreStyles.label, { color: c.textPrimary, flex: 1 }]}>Dark mode</Text>
           <Switch
