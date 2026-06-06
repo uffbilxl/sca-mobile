@@ -1,13 +1,13 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import {
   View, Text, TextInput, ScrollView, TouchableOpacity, StyleSheet, FlatList, Linking,
   LayoutAnimation, Platform, UIManager, ActivityIndicator,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { MapPin, ChevronDown, ChevronUp, ListFilter } from 'lucide-react-native'
+import { useFocusEffect } from '@react-navigation/native'
+import { MapPin, ChevronDown, ChevronUp, ListFilter, WifiOff } from 'lucide-react-native'
 import { useTheme } from '../lib/ThemeContext'
 import { typeColors, typeLabels } from '../lib/theme'
-import { OPPORTUNITIES } from '../lib/data'
 import { fetchOpportunities } from '../lib/api'
 import type { Opportunity, OpportunityType } from '../lib/types'
 import AppHeader from '../components/AppHeader'
@@ -26,7 +26,7 @@ const TYPE_FILTERS: { label: string; value: OpportunityType | 'ALL' }[] = [
   { label: 'Insight', value: 'INSIGHT' },
 ]
 
-function OppCard({ opp, c }: { opp: typeof OPPORTUNITIES[0]; c: any }) {
+function OppCard({ opp, c }: { opp: Opportunity; c: any }) {
   const [open, setOpen] = useState(false)
   const tInfo = typeColors[opp.type]
   const badgeBg   = tInfo ? c[tInfo.bg]   : c.blueLight
@@ -106,18 +106,22 @@ export default function OpportunitiesScreen() {
   const { colors: c } = useTheme()
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState<OpportunityType | 'ALL'>('ALL')
-  const [opps, setOpps] = useState<Opportunity[]>(OPPORTUNITIES)
+  const [opps, setOpps] = useState<Opportunity[]>([])
   const [loading, setLoading] = useState(true)
-  const [offline, setOffline] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
+  useFocusEffect(useCallback(() => {
+    let active = true
     setLoading(true)
-    fetchOpportunities().then(({ data, live }) => {
+    setError(null)
+    fetchOpportunities().then(({ data, live, error: err }) => {
+      if (!active) return
       setOpps(data)
-      setOffline(!live)
+      setError(live ? null : err)
       setLoading(false)
     })
-  }, [])
+    return () => { active = false }
+  }, []))
 
   const filtered = useMemo(() => {
     return opps.filter(o => {
@@ -140,9 +144,13 @@ export default function OpportunitiesScreen() {
       <AnimatedBackground />
       <AppHeader variant="screen" title="Opportunities" />
 
-      {offline && (
-        <View style={[styles.offlineBanner, { backgroundColor: c.bgInput, borderBottomColor: c.border }]}>
-          <Text style={[styles.offlineText, { color: c.textMuted }]}>Showing cached data — couldn't reach bcusca.org</Text>
+      {error && !loading && (
+        <View style={[styles.errorCard, { backgroundColor: c.bgCard, borderColor: c.border }]}>
+          <WifiOff size={18} color={c.textMuted} strokeWidth={1.75} />
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.errorTitle, { color: c.textPrimary }]}>Couldn't load opportunities</Text>
+            <Text style={[styles.errorSub, { color: c.textMuted }]}>{error}</Text>
+          </View>
         </View>
       )}
 
@@ -217,8 +225,13 @@ export default function OpportunitiesScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
 
-  offlineBanner: { paddingHorizontal: 16, paddingVertical: 7, borderBottomWidth: 1 },
-  offlineText: { fontSize: 11, fontFamily: 'Geist-Regular', textAlign: 'center' },
+  errorCard: {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    marginHorizontal: 16, marginTop: 10,
+    padding: 12, borderRadius: 10, borderWidth: 1,
+  },
+  errorTitle: { fontSize: 13, fontFamily: 'Geist-SemiBold' },
+  errorSub: { fontSize: 11, fontFamily: 'Geist-Regular', marginTop: 1 },
 
   searchWrap: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 8 },
   searchInput: {

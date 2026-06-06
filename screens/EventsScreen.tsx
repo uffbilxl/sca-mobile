@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Linking, Animated, Platform, ActivityIndicator } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { MapPin, Wifi, Clock, Calendar } from 'lucide-react-native'
+import { useFocusEffect } from '@react-navigation/native'
+import { MapPin, Wifi, Clock, Calendar, WifiOff } from 'lucide-react-native'
 import { useTheme } from '../lib/ThemeContext'
 import type { SCAEvent } from '../lib/types'
 import { fetchEvents, STATIC_EVENTS } from '../lib/api'
@@ -63,16 +64,20 @@ export default function EventsScreen() {
   const { colors: c } = useTheme()
   const [events, setEvents] = useState<SCAEvent[]>(STATIC_EVENTS)
   const [loading, setLoading] = useState(true)
-  const [offline, setOffline] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
+  useFocusEffect(useCallback(() => {
+    let active = true
     setLoading(true)
-    fetchEvents().then(({ data, live }) => {
+    setError(null)
+    fetchEvents().then(({ data, live, error: err }) => {
+      if (!active) return
       setEvents(data)
-      setOffline(!live)
+      setError(live ? null : err)
       setLoading(false)
     })
-  }, [])
+    return () => { active = false }
+  }, []))
 
   const now = new Date()
   const upcoming = events.filter(e => e.date >= now).sort((a, b) => +a.date - +b.date)
@@ -86,9 +91,13 @@ export default function EventsScreen() {
     <View style={[styles.outer, { backgroundColor: c.bgPage }]}>
       <AnimatedBackground />
       <AppHeader variant="screen" title="Events" />
-      {offline && (
-        <View style={[styles.offlineBanner, { backgroundColor: c.bgInput, borderBottomColor: c.border }]}>
-          <Text style={[styles.offlineText, { color: c.textMuted }]}>Showing cached data — couldn't reach bcusca.org</Text>
+      {error && !loading && (
+        <View style={[styles.errorCard, { backgroundColor: c.bgCard, borderColor: c.border }]}>
+          <WifiOff size={18} color={c.textMuted} strokeWidth={1.75} />
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.errorTitle, { color: c.textPrimary }]}>Couldn't load events</Text>
+            <Text style={[styles.errorSub, { color: c.textMuted }]}>{error}</Text>
+          </View>
         </View>
       )}
       <ScrollView
@@ -234,8 +243,13 @@ const styles = StyleSheet.create({
   scroll: { flex: 1 },
   content: { paddingHorizontal: 16, gap: 14, paddingTop: 14 },
 
-  offlineBanner: { paddingHorizontal: 16, paddingVertical: 7, borderBottomWidth: 1 },
-  offlineText: { fontSize: 11, fontFamily: 'Geist-Regular', textAlign: 'center' },
+  errorCard: {
+    flexDirection: 'row', alignItems: 'center', gap: 10,
+    marginHorizontal: 16, marginTop: 10,
+    padding: 12, borderRadius: 10, borderWidth: 1,
+  },
+  errorTitle: { fontSize: 13, fontFamily: 'Geist-SemiBold' },
+  errorSub: { fontSize: 11, fontFamily: 'Geist-Regular', marginTop: 1 },
 
   /* Hero (always dark) */
   hero: {

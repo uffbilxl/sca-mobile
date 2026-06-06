@@ -1,7 +1,16 @@
-import { OPPORTUNITIES } from './data'
 import type { Opportunity, SCAEvent } from './types'
 
 const API = 'https://bcusca.org/api'
+const TIMEOUT_MS = 10000
+
+function fetchWithTimeout(url: string): Promise<Response> {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS)
+  return fetch(url, {
+    headers: { Accept: 'application/json' },
+    signal: controller.signal,
+  }).finally(() => clearTimeout(timer))
+}
 
 function toDate(v: any): Date | null {
   if (v == null) return null
@@ -32,19 +41,19 @@ function parseEvent(e: any): SCAEvent {
   return { ...e, date: new Date(e.date), endDate: toDate(e.endDate) }
 }
 
-export async function fetchOpportunities(): Promise<{ data: Opportunity[]; live: boolean }> {
+export type FetchResult<T> = { data: T[]; live: boolean; error: string | null }
+
+export async function fetchOpportunities(): Promise<FetchResult<Opportunity>> {
   try {
-    const res = await fetch(`${API}/opportunities`, {
-      headers: { Accept: 'application/json' },
-      signal: AbortSignal.timeout(8000),
-    })
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    const res = await fetchWithTimeout(`${API}/opportunities`)
+    if (!res.ok) throw new Error(`Server returned ${res.status}`)
     const raw: any[] = await res.json()
-    if (!Array.isArray(raw)) throw new Error('unexpected shape')
-    return { data: raw.map(parseOpportunity), live: true }
-  } catch (err) {
-    console.warn('[bcusca/api] fetchOpportunities – using static fallback:', err)
-    return { data: OPPORTUNITIES, live: false }
+    if (!Array.isArray(raw)) throw new Error('Unexpected response shape')
+    return { data: raw.map(parseOpportunity), live: true, error: null }
+  } catch (err: any) {
+    const msg = err?.name === 'AbortError' ? 'Request timed out' : (err?.message ?? 'Network error')
+    console.warn('[bcusca/api] fetchOpportunities failed:', msg)
+    return { data: [], live: false, error: msg }
   }
 }
 
@@ -65,18 +74,16 @@ export const STATIC_EVENTS: SCAEvent[] = [
   },
 ]
 
-export async function fetchEvents(): Promise<{ data: SCAEvent[]; live: boolean }> {
+export async function fetchEvents(): Promise<FetchResult<SCAEvent>> {
   try {
-    const res = await fetch(`${API}/events`, {
-      headers: { Accept: 'application/json' },
-      signal: AbortSignal.timeout(8000),
-    })
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    const res = await fetchWithTimeout(`${API}/events`)
+    if (!res.ok) throw new Error(`Server returned ${res.status}`)
     const raw: any[] = await res.json()
-    if (!Array.isArray(raw)) throw new Error('unexpected shape')
-    return { data: raw.map(parseEvent), live: true }
-  } catch (err) {
-    console.warn('[bcusca/api] fetchEvents – using static fallback:', err)
-    return { data: STATIC_EVENTS, live: false }
+    if (!Array.isArray(raw)) throw new Error('Unexpected response shape')
+    return { data: raw.map(parseEvent), live: true, error: null }
+  } catch (err: any) {
+    const msg = err?.name === 'AbortError' ? 'Request timed out' : (err?.message ?? 'Network error')
+    console.warn('[bcusca/api] fetchEvents failed:', msg)
+    return { data: STATIC_EVENTS, live: false, error: msg }
   }
 }
