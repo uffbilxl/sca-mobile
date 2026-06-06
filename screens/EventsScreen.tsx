@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Linking, Animated } from 'react-native'
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Linking, Animated, Platform } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { colors } from '../lib/theme'
 import type { SCAEvent } from '../lib/types'
+
+const nd = Platform.OS !== 'web'
 
 const EVENTS: SCAEvent[] = [
   {
@@ -51,8 +53,8 @@ function PulseDot() {
   useEffect(() => {
     Animated.loop(
       Animated.sequence([
-        Animated.timing(opacity, { toValue: 0.15, duration: 700, useNativeDriver: true }),
-        Animated.timing(opacity, { toValue: 1, duration: 700, useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 0.15, duration: 700, useNativeDriver: nd }),
+        Animated.timing(opacity, { toValue: 1, duration: 700, useNativeDriver: nd }),
       ])
     ).start()
   }, [])

@@ -1,6 +1,8 @@
 import { useRef, useEffect, useState } from 'react'
-import { Animated, View, Text, StyleSheet, Easing } from 'react-native'
+import { Animated, View, Text, StyleSheet, Easing, Platform } from 'react-native'
 import { colors } from '../lib/theme'
+
+const nd = Platform.OS !== 'web'
 
 const ITEMS = [
   'Google', 'Open to all BCU Computing students', 'Amazon', 'Internships & Placements',
@@ -22,7 +24,7 @@ export default function TickerBanner() {
       Animated.timing(translateX, {
         toValue: -halfWidth,
         duration: halfWidth * 16,
-        useNativeDriver: true,
+        useNativeDriver: nd,
         easing: Easing.linear,
       })
     )

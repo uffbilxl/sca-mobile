@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react'
-import { View, Text, Animated, StyleSheet, Dimensions, Easing, Image } from 'react-native'
+import { View, Text, Animated, StyleSheet, Dimensions, Easing, Image, Platform } from 'react-native'
 import { colors, fonts } from '../lib/theme'
+
+const nd = Platform.OS !== 'web'
 
 const { width } = Dimensions.get('window')
 
@@ -21,7 +23,7 @@ function TickerText() {
       Animated.timing(translateX, {
         toValue: -totalWidth,
         duration: totalWidth * 20,
-        useNativeDriver: true,
+        useNativeDriver: nd,
         easing: Easing.linear,
       })
     ).start()
@@ -57,26 +59,26 @@ export default function SplashScreen({ onDone }: Props) {
     Animated.sequence([
       Animated.delay(100),
       Animated.parallel([
-        Animated.timing(logoOpacity, { toValue: 1, duration: 600, useNativeDriver: true }),
-        Animated.timing(logoScale, { toValue: 1, duration: 600, easing: Easing.out(Easing.back(1.4)), useNativeDriver: true }),
+        Animated.timing(logoOpacity, { toValue: 1, duration: 600, useNativeDriver: nd }),
+        Animated.timing(logoScale, { toValue: 1, duration: 600, easing: Easing.out(Easing.back(1.4)), useNativeDriver: nd }),
       ]),
       Animated.delay(0),
       Animated.parallel([
-        Animated.timing(pillOpacity, { toValue: 1, duration: 380, useNativeDriver: true }),
-        Animated.timing(pillY, { toValue: 0, duration: 380, easing: Easing.out(Easing.quad), useNativeDriver: true }),
+        Animated.timing(pillOpacity, { toValue: 1, duration: 380, useNativeDriver: nd }),
+        Animated.timing(pillY, { toValue: 0, duration: 380, easing: Easing.out(Easing.quad), useNativeDriver: nd }),
       ]),
       Animated.delay(50),
       Animated.parallel([
-        Animated.timing(headingOpacity, { toValue: 1, duration: 380, useNativeDriver: true }),
-        Animated.timing(headingY, { toValue: 0, duration: 380, easing: Easing.out(Easing.quad), useNativeDriver: true }),
+        Animated.timing(headingOpacity, { toValue: 1, duration: 380, useNativeDriver: nd }),
+        Animated.timing(headingY, { toValue: 0, duration: 380, easing: Easing.out(Easing.quad), useNativeDriver: nd }),
       ]),
       Animated.delay(50),
       Animated.parallel([
-        Animated.timing(taglineOpacity, { toValue: 1, duration: 380, useNativeDriver: true }),
-        Animated.timing(taglineY, { toValue: 0, duration: 380, easing: Easing.out(Easing.quad), useNativeDriver: true }),
+        Animated.timing(taglineOpacity, { toValue: 1, duration: 380, useNativeDriver: nd }),
+        Animated.timing(taglineY, { toValue: 0, duration: 380, easing: Easing.out(Easing.quad), useNativeDriver: nd }),
       ]),
       Animated.delay(1200),
-      Animated.timing(screenOpacity, { toValue: 0, duration: 400, useNativeDriver: true }),
+      Animated.timing(screenOpacity, { toValue: 0, duration: 400, useNativeDriver: nd }),
     ]).start(() => onDone())
   }, [])
 

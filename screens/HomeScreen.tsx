@@ -1,10 +1,12 @@
 import { useRef, useEffect } from 'react'
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Linking, Animated } from 'react-native'
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Linking, Animated, Platform } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native'
 import { colors, typeColors, typeLabels } from '../lib/theme'
 import { OPPORTUNITIES } from '../lib/data'
 import TickerBanner from '../components/TickerBanner'
+
+const nd = Platform.OS !== 'web'
 
 const STRANDS = [
   { label: 'Opportunities', desc: 'Internships, placements & graduate roles', to: 'Opportunities' as const, nested: false },
@@ -26,8 +28,8 @@ function PulseDot() {
   useEffect(() => {
     Animated.loop(
       Animated.sequence([
-        Animated.timing(opacity, { toValue: 0.15, duration: 700, useNativeDriver: true }),
-        Animated.timing(opacity, { toValue: 1, duration: 700, useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 0.15, duration: 700, useNativeDriver: nd }),
+        Animated.timing(opacity, { toValue: 1, duration: 700, useNativeDriver: nd }),
       ])
     ).start()
   }, [])
