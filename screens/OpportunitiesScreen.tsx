@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import {
   View, Text, TextInput, ScrollView, TouchableOpacity, StyleSheet, FlatList, Linking,
-  LayoutAnimation, Platform, UIManager,
+  LayoutAnimation, Platform, UIManager, ActivityIndicator,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { MapPin, ChevronDown, ChevronUp, ListFilter } from 'lucide-react-native'
@@ -107,9 +107,16 @@ export default function OpportunitiesScreen() {
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState<OpportunityType | 'ALL'>('ALL')
   const [opps, setOpps] = useState<Opportunity[]>(OPPORTUNITIES)
+  const [loading, setLoading] = useState(true)
+  const [offline, setOffline] = useState(false)
 
   useEffect(() => {
-    fetchOpportunities().then(setOpps)
+    setLoading(true)
+    fetchOpportunities().then(({ data, live }) => {
+      setOpps(data)
+      setOffline(!live)
+      setLoading(false)
+    })
   }, [])
 
   const filtered = useMemo(() => {
@@ -132,6 +139,12 @@ export default function OpportunitiesScreen() {
     <View style={[styles.container, { backgroundColor: c.bgPage }]}>
       <AnimatedBackground />
       <AppHeader variant="screen" title="Opportunities" />
+
+      {offline && (
+        <View style={[styles.offlineBanner, { backgroundColor: c.bgInput, borderBottomColor: c.border }]}>
+          <Text style={[styles.offlineText, { color: c.textMuted }]}>Showing cached data — couldn't reach bcusca.org</Text>
+        </View>
+      )}
 
       {/* Search */}
       <View style={[styles.searchWrap, { backgroundColor: c.bgPage }]}>
@@ -183,21 +196,29 @@ export default function OpportunitiesScreen() {
         </ScrollView>
       </View>
 
-      <Text style={[styles.count, { color: c.textMuted }]}>{filtered.length} {filtered.length === 1 ? 'opportunity' : 'opportunities'}</Text>
+      {loading
+        ? <ActivityIndicator size="small" color={c.blue} style={{ marginTop: 40 }} />
+        : <Text style={[styles.count, { color: c.textMuted }]}>{filtered.length} {filtered.length === 1 ? 'opportunity' : 'opportunities'}</Text>
+      }
 
-      <FlatList
-        data={filtered}
-        keyExtractor={o => o.id}
-        renderItem={({ item }) => <OppCard opp={item} c={c} />}
-        contentContainerStyle={[styles.list, { paddingBottom: insets.bottom + 24 }]}
-        showsVerticalScrollIndicator={false}
-      />
+      {!loading && (
+        <FlatList
+          data={filtered}
+          keyExtractor={o => o.id}
+          renderItem={({ item }) => <OppCard opp={item} c={c} />}
+          contentContainerStyle={[styles.list, { paddingBottom: insets.bottom + 24 }]}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
     </View>
   )
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+
+  offlineBanner: { paddingHorizontal: 16, paddingVertical: 7, borderBottomWidth: 1 },
+  offlineText: { fontSize: 11, fontFamily: 'Geist-Regular', textAlign: 'center' },
 
   searchWrap: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 8 },
   searchInput: {

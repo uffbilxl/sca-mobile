@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Linking, Animated, Platform } from 'react-native'
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Linking, Animated, Platform, ActivityIndicator } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { MapPin, Wifi, Clock, Calendar } from 'lucide-react-native'
 import { useTheme } from '../lib/ThemeContext'
@@ -62,9 +62,16 @@ export default function EventsScreen() {
   const insets = useSafeAreaInsets()
   const { colors: c } = useTheme()
   const [events, setEvents] = useState<SCAEvent[]>(STATIC_EVENTS)
+  const [loading, setLoading] = useState(true)
+  const [offline, setOffline] = useState(false)
 
   useEffect(() => {
-    fetchEvents().then(setEvents)
+    setLoading(true)
+    fetchEvents().then(({ data, live }) => {
+      setEvents(data)
+      setOffline(!live)
+      setLoading(false)
+    })
   }, [])
 
   const now = new Date()
@@ -79,13 +86,20 @@ export default function EventsScreen() {
     <View style={[styles.outer, { backgroundColor: c.bgPage }]}>
       <AnimatedBackground />
       <AppHeader variant="screen" title="Events" />
+      {offline && (
+        <View style={[styles.offlineBanner, { backgroundColor: c.bgInput, borderBottomColor: c.border }]}>
+          <Text style={[styles.offlineText, { color: c.textMuted }]}>Showing cached data — couldn't reach bcusca.org</Text>
+        </View>
+      )}
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 32 }]}
         showsVerticalScrollIndicator={false}
       >
-        {/* Countdown hero (always dark) */}
-        {nextEvent && !countdown.over && (
+        {loading && <ActivityIndicator size="small" color="#4a82f0" style={{ marginTop: 32 }} />}
+
+        {/* Countdown hero + tabs + list — hidden while loading */}
+        {!loading && nextEvent && !countdown.over && (
           <View style={styles.hero}>
             <View pointerEvents="none" style={styles.heroGlowWrap}>
               <View style={styles.heroGlow} />
@@ -130,7 +144,7 @@ export default function EventsScreen() {
         )}
 
         {/* Tabs */}
-        <View style={[styles.tabs, { backgroundColor: c.bgInput }]}>
+        {!loading && <View style={[styles.tabs, { backgroundColor: c.bgInput }]}>
           {(['upcoming', 'past'] as const).map(t => (
             <TouchableOpacity
               key={t}
@@ -142,10 +156,10 @@ export default function EventsScreen() {
               </Text>
             </TouchableOpacity>
           ))}
-        </View>
+        </View>}
 
         {/* Event list */}
-        {list.length === 0 ? (
+        {!loading && (list.length === 0 ? (
           <View style={[styles.empty, { backgroundColor: c.bgCard, borderColor: c.border }]}>
             <Calendar size={28} color={c.textMuted} strokeWidth={1.5} />
             <Text style={[styles.emptyTitle, { color: c.textPrimary }]}>{tab === 'upcoming' ? 'Events coming soon' : 'No past events yet'}</Text>
@@ -209,7 +223,7 @@ export default function EventsScreen() {
               )
             })}
           </View>
-        )}
+        ))}
       </ScrollView>
     </View>
   )
@@ -219,6 +233,9 @@ const styles = StyleSheet.create({
   outer: { flex: 1 },
   scroll: { flex: 1 },
   content: { paddingHorizontal: 16, gap: 14, paddingTop: 14 },
+
+  offlineBanner: { paddingHorizontal: 16, paddingVertical: 7, borderBottomWidth: 1 },
+  offlineText: { fontSize: 11, fontFamily: 'Geist-Regular', textAlign: 'center' },
 
   /* Hero (always dark) */
   hero: {

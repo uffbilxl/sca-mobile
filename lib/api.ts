@@ -32,19 +32,19 @@ function parseEvent(e: any): SCAEvent {
   return { ...e, date: new Date(e.date), endDate: toDate(e.endDate) }
 }
 
-export async function fetchOpportunities(): Promise<Opportunity[]> {
+export async function fetchOpportunities(): Promise<{ data: Opportunity[]; live: boolean }> {
   try {
     const res = await fetch(`${API}/opportunities`, {
       headers: { Accept: 'application/json' },
       signal: AbortSignal.timeout(8000),
     })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    const data: any[] = await res.json()
-    if (!Array.isArray(data)) throw new Error('unexpected shape')
-    return data.map(parseOpportunity)
+    const raw: any[] = await res.json()
+    if (!Array.isArray(raw)) throw new Error('unexpected shape')
+    return { data: raw.map(parseOpportunity), live: true }
   } catch (err) {
     console.warn('[bcusca/api] fetchOpportunities – using static fallback:', err)
-    return OPPORTUNITIES
+    return { data: OPPORTUNITIES, live: false }
   }
 }
 
@@ -65,18 +65,18 @@ export const STATIC_EVENTS: SCAEvent[] = [
   },
 ]
 
-export async function fetchEvents(): Promise<SCAEvent[]> {
+export async function fetchEvents(): Promise<{ data: SCAEvent[]; live: boolean }> {
   try {
     const res = await fetch(`${API}/events`, {
       headers: { Accept: 'application/json' },
       signal: AbortSignal.timeout(8000),
     })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    const data: any[] = await res.json()
-    if (!Array.isArray(data)) throw new Error('unexpected shape')
-    return data.map(parseEvent)
+    const raw: any[] = await res.json()
+    if (!Array.isArray(raw)) throw new Error('unexpected shape')
+    return { data: raw.map(parseEvent), live: true }
   } catch (err) {
     console.warn('[bcusca/api] fetchEvents – using static fallback:', err)
-    return STATIC_EVENTS
+    return { data: STATIC_EVENTS, live: false }
   }
 }
