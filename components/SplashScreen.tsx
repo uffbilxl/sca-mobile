@@ -11,23 +11,52 @@ const TICKER_ITEMS = [
   'Arm', 'DRW', 'Accenture', 'Palantir', 'Goldman Sachs', 'Mastercard',
   'IBM', 'Capgemini', 'EY', 'KPMG', 'NatWest', 'Deliveroo',
 ]
+const doubled = [...TICKER_ITEMS, ...TICKER_ITEMS]
+
+if (Platform.OS === 'web' && typeof document !== 'undefined') {
+  const id = 'sca-splash-ticker-kf'
+  if (!document.getElementById(id)) {
+    const el = document.createElement('style')
+    el.id = id
+    el.textContent = `@keyframes scaSplashTicker{from{transform:translateX(0)}to{transform:translateX(-50%)}}`
+    document.head.appendChild(el)
+  }
+}
 
 function TickerText() {
   const translateX = useRef(new Animated.Value(0)).current
-  const doubled = [...TICKER_ITEMS, ...TICKER_ITEMS]
   const itemWidth = 120
   const totalWidth = TICKER_ITEMS.length * itemWidth
 
   useEffect(() => {
+    if (Platform.OS === 'web') return
     Animated.loop(
       Animated.timing(translateX, {
         toValue: -totalWidth,
         duration: totalWidth * 20,
-        useNativeDriver: nd,
+        useNativeDriver: true,
         easing: Easing.linear,
       })
     ).start()
   }, [])
+
+  if (Platform.OS === 'web') {
+    return (
+      <View style={styles.tickerWrap}>
+        {/* @ts-ignore */}
+        <View style={[styles.tickerRow, {
+          animationName: 'scaSplashTicker',
+          animationDuration: '28s',
+          animationTimingFunction: 'linear',
+          animationIterationCount: 'infinite',
+        } as any]}>
+          {doubled.map((item, i) => (
+            <Text key={i} style={styles.tickerItem}>{item}  ·  </Text>
+          ))}
+        </View>
+      </View>
+    )
+  }
 
   return (
     <View style={styles.tickerWrap}>
