@@ -201,10 +201,10 @@ function ThemedApp() {
             tabBarLabelStyle: { fontSize: 10, fontFamily: 'Geist-Medium' } as any,
           })}
         >
-          <Tab.Screen name="Home" component={withFade(HomeScreen)} options={{ title: 'Home' }} />
-          <Tab.Screen name="Opportunities" component={withFade(OpportunitiesScreen)} />
-          <Tab.Screen name="Events" component={withFade(EventsScreen)} />
-          <Tab.Screen name="SCA" component={withFade(SCAScreen)} options={{ title: 'SCA Roles' }} />
+          <Tab.Screen name="Home" component={HomeScreen} options={{ title: 'Home' }} />
+          <Tab.Screen name="Opportunities" component={OpportunitiesScreen} />
+          <Tab.Screen name="Events" component={EventsScreen} />
+          <Tab.Screen name="SCA" component={SCAScreen} options={{ title: 'SCA Roles' }} />
           <Tab.Screen name="More" component={MoreStackNavigator} options={{ headerShown: false }} />
         </Tab.Navigator>
       </NavigationContainer>
