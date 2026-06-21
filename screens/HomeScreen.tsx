@@ -89,52 +89,52 @@ export default function HomeScreen() {
         contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 48 }]}
         showsVerticalScrollIndicator={false}
       >
-        {/* ── Hero card (always dark) ───────────────────── */}
+        {/* ── Hero card ───────────────────────────────── */}
         <View style={styles.heroWrap}>
-          <View style={styles.hero}>
+          <View style={[styles.hero, { backgroundColor: c.bgCard, borderColor: c.border }]}>
             <View style={[{ pointerEvents: 'none' } as any, styles.heroGlow, styles.heroGlowTeal]} />
             <View style={[{ pointerEvents: 'none' } as any, styles.heroGlow, styles.heroGlowPurple]} />
 
-            <View style={styles.bcuPill}>
+            <View style={[styles.bcuPill, { borderColor: c.border }]}>
               <View style={styles.greenDot} />
-              <Text style={styles.bcuPillText}>BCU STUDENT COMPUTING ASSOCIATION</Text>
+              <Text style={[styles.bcuPillText, { color: c.textMuted }]}>BCU STUDENT COMPUTING ASSOCIATION</Text>
             </View>
 
-            <View style={styles.liveBadge}>
+            <View style={[styles.liveBadge, { backgroundColor: `${teal}18`, borderColor: `${teal}35` }]}>
               <PulseDot />
               <Text style={styles.liveBadgeText}>Now live · Updated regularly</Text>
             </View>
 
-            <Text style={styles.heroTitle}>Your BCU Computing{'\n'}Community & Career Hub</Text>
-            <Text style={styles.heroSub}>
+            <Text style={[styles.heroTitle, { color: c.textPrimary }]}>Your BCU Computing{'\n'}Community & Career Hub</Text>
+            <Text style={[styles.heroSub, { color: c.textSecondary }]}>
               The SCA connects BCU computing students with internships, placements, events, and career resources. Open to all. Free forever.
             </Text>
-            <Text style={styles.heroDisclaimer}>
+            <Text style={[styles.heroDisclaimer, { color: c.textMuted }]}>
               Student-run, not an official BCU service. Opportunities curated by students, for students.
             </Text>
 
             <View style={styles.btnRow}>
               <TouchableOpacity
-                style={styles.btnPrimary}
+                style={[styles.btnPrimary, { backgroundColor: c.textPrimary }]}
                 onPress={() => navigation.navigate('Opportunities')}
                 activeOpacity={0.85}
               >
-                <Text style={styles.btnPrimaryText}>Explore Opportunities →</Text>
+                <Text style={[styles.btnPrimaryText, { color: c.bgPage }]}>Explore Opportunities →</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.btnSecondary}
+                style={[styles.btnSecondary, { borderColor: c.border }]}
                 onPress={() => navigation.navigate('Events')}
                 activeOpacity={0.85}
               >
-                <Text style={styles.btnSecondaryText}>Upcoming Events</Text>
+                <Text style={[styles.btnSecondaryText, { color: c.textSecondary }]}>Upcoming Events</Text>
               </TouchableOpacity>
             </View>
 
             <View style={styles.statsRow}>
-              <Text style={styles.statNum}>{totalOpen}</Text>
-              <Text style={styles.statLabel}>open opportunities</Text>
-              <View style={styles.statDivider} />
-              <Text style={styles.statLabel}>BCU computing students</Text>
+              <Text style={[styles.statNum, { color: c.textPrimary }]}>{totalOpen}</Text>
+              <Text style={[styles.statLabel, { color: c.textMuted }]}>open opportunities</Text>
+              <View style={[styles.statDivider, { backgroundColor: c.border }]} />
+              <Text style={[styles.statLabel, { color: c.textMuted }]}>BCU computing students</Text>
             </View>
           </View>
         </View>
@@ -215,21 +215,19 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* ── You belong here CTA (always dark) ────────── */}
-        <View style={styles.ctaSection}>
-          <View style={[{ pointerEvents: 'none' } as any, styles.ctaGlow, styles.ctaGlowTeal]} />
-          <View style={[{ pointerEvents: 'none' } as any, styles.ctaGlow, styles.ctaGlowPurple]} />
-          <Text style={styles.ctaEyebrow}>Open to everyone</Text>
-          <Text style={styles.ctaTitle}>You belong here</Text>
-          <Text style={styles.ctaText}>
+        {/* ── You belong here CTA ──────────────────────── */}
+        <View style={[styles.ctaSection, { backgroundColor: c.textPrimary, borderColor: c.textPrimary }]}>
+          <Text style={[styles.ctaEyebrow, { color: `${teal}` }]}>Open to everyone</Text>
+          <Text style={[styles.ctaTitle, { color: c.bgPage }]}>You belong here</Text>
+          <Text style={[styles.ctaText, { color: c.textMuted }]}>
             The SCA is for every BCU computing student. No experience needed. No application required. Just show up.
           </Text>
           <TouchableOpacity
-            style={styles.ctaBtn}
+            style={[styles.ctaBtn, { backgroundColor: c.bgPage }]}
             onPress={() => Linking.openURL('https://www.linkedin.com/company/bcu-student-computing-association/')}
             activeOpacity={0.85}
           >
-            <Text style={styles.ctaBtnText}>Join the SCA →</Text>
+            <Text style={[styles.ctaBtnText, { color: c.textPrimary }]}>Join the SCA →</Text>
           </TouchableOpacity>
         </View>
 
@@ -250,51 +248,44 @@ const styles = StyleSheet.create({
   scroll: { flex: 1 },
   content: { paddingBottom: 48 },
 
-  /* Hero (always dark — does not participate in theme) */
   heroWrap: { paddingHorizontal: 12, paddingTop: 12, paddingBottom: 4 },
   hero: {
-    backgroundColor: '#0d1420',
     borderRadius: 18,
     padding: 20,
     gap: 12,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.07)',
   },
-  heroGlow: { position: 'absolute', width: 500, height: 500, borderRadius: 250 },
-  heroGlowTeal:   { bottom: -220, left: -150, backgroundColor: 'rgba(13,110,89,0.07)' },
-  heroGlowPurple: { bottom: -220, right: -150, backgroundColor: 'rgba(88,28,135,0.09)' },
 
   bcuPill: {
     flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start',
-    borderWidth: 1, borderColor: '#21262d', borderRadius: 999,
+    borderWidth: 1, borderRadius: 999,
     paddingHorizontal: 10, paddingVertical: 5, marginTop: 4,
   },
   greenDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: teal },
-  bcuPillText: { fontSize: 9, color: '#8b949e', fontFamily: 'Geist-Regular', letterSpacing: 0.6 },
+  bcuPillText: { fontSize: 9, fontFamily: 'Geist-Regular', letterSpacing: 0.6 },
 
   liveBadge: {
     flexDirection: 'row', alignItems: 'center', gap: 7, alignSelf: 'flex-start',
-    backgroundColor: 'rgba(63,182,139,0.10)', borderWidth: 1,
-    borderColor: 'rgba(63,182,139,0.22)', borderRadius: 999,
+    borderWidth: 1, borderRadius: 999,
     paddingHorizontal: 11, paddingVertical: 5,
   },
   liveBadgeText: { fontSize: 10, color: teal, fontFamily: 'Geist-Medium', letterSpacing: 0.4 },
 
-  heroTitle: { fontSize: 28, fontFamily: 'Geist-Bold', color: '#f0f4ff', letterSpacing: -0.7, lineHeight: 36 },
-  heroSub: { fontSize: 13, fontFamily: 'Geist-Regular', color: '#8da0bc', lineHeight: 21 },
-  heroDisclaimer: { fontSize: 11, fontFamily: 'Geist-Regular', color: '#4a6080', lineHeight: 17 },
+  heroTitle: { fontSize: 28, fontFamily: 'Geist-Bold', letterSpacing: -0.7, lineHeight: 36 },
+  heroSub: { fontSize: 13, fontFamily: 'Geist-Regular', lineHeight: 21 },
+  heroDisclaimer: { fontSize: 11, fontFamily: 'Geist-Regular', lineHeight: 17 },
 
   btnRow: { flexDirection: 'row', gap: 10, flexWrap: 'wrap' },
-  btnPrimary: { backgroundColor: '#4a82f0', paddingHorizontal: 18, paddingVertical: 12, borderRadius: 10 },
-  btnPrimaryText: { color: '#fff', fontSize: 13, fontFamily: 'Geist-SemiBold' },
-  btnSecondary: { borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', paddingHorizontal: 18, paddingVertical: 12, borderRadius: 10 },
-  btnSecondaryText: { color: '#c9d1d9', fontSize: 13, fontFamily: 'Geist-Medium' },
+  btnPrimary: { paddingHorizontal: 18, paddingVertical: 12, borderRadius: 10 },
+  btnPrimaryText: { fontSize: 13, fontFamily: 'Geist-SemiBold' },
+  btnSecondary: { borderWidth: 1, paddingHorizontal: 18, paddingVertical: 12, borderRadius: 10 },
+  btnSecondaryText: { fontSize: 13, fontFamily: 'Geist-Medium' },
 
   statsRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  statNum: { fontSize: 13, fontFamily: 'Geist-Bold', color: '#e6edf3' },
-  statLabel: { fontSize: 11, fontFamily: 'Geist-Regular', color: '#4a6080' },
-  statDivider: { width: 1, height: 12, backgroundColor: '#1e2d45' },
+  statNum: { fontSize: 13, fontFamily: 'Geist-Bold' },
+  statLabel: { fontSize: 11, fontFamily: 'Geist-Regular' },
+  statDivider: { width: 1, height: 12 },
 
   /* Sections */
   section: { paddingHorizontal: 16, paddingTop: 24, paddingBottom: 8 },
@@ -351,22 +342,16 @@ const styles = StyleSheet.create({
   offerTitle: { fontSize: 13, fontFamily: 'Geist-SemiBold', marginBottom: 4 },
   offerText: { fontSize: 12, fontFamily: 'Geist-Regular', lineHeight: 18 },
 
-  /* CTA section (always dark) */
   ctaSection: {
     marginHorizontal: 12, marginTop: 16, marginBottom: 8,
-    backgroundColor: '#0d1420',
     borderRadius: 18, padding: 24,
-    overflow: 'hidden', gap: 12,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)',
+    gap: 12, borderWidth: 1,
   },
-  ctaGlow: { position: 'absolute', width: 400, height: 400, borderRadius: 200 },
-  ctaGlowTeal:   { bottom: -200, left: -100, backgroundColor: 'rgba(13,110,89,0.07)' },
-  ctaGlowPurple: { bottom: -200, right: -100, backgroundColor: 'rgba(88,28,135,0.09)' },
-  ctaEyebrow: { fontSize: 9, color: teal, letterSpacing: 1.6, textTransform: 'uppercase', fontFamily: 'Geist-Medium' },
-  ctaTitle: { fontSize: 26, fontFamily: 'Geist-Bold', color: '#f0f4ff', letterSpacing: -0.5 },
-  ctaText: { fontSize: 13, fontFamily: 'Geist-Regular', color: '#8da0bc', lineHeight: 21 },
-  ctaBtn: { alignSelf: 'flex-start', backgroundColor: '#4a82f0', paddingHorizontal: 20, paddingVertical: 12, borderRadius: 10, marginTop: 4 },
-  ctaBtnText: { color: '#fff', fontSize: 14, fontFamily: 'Geist-SemiBold' },
+  ctaEyebrow: { fontSize: 9, letterSpacing: 1.6, textTransform: 'uppercase', fontFamily: 'Geist-Medium' },
+  ctaTitle: { fontSize: 26, fontFamily: 'Geist-Bold', letterSpacing: -0.5 },
+  ctaText: { fontSize: 13, fontFamily: 'Geist-Regular', lineHeight: 21 },
+  ctaBtn: { alignSelf: 'flex-start', paddingHorizontal: 20, paddingVertical: 12, borderRadius: 10, marginTop: 4 },
+  ctaBtnText: { fontSize: 14, fontFamily: 'Geist-SemiBold' },
 
   /* Footer */
   footer: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 8, gap: 4, alignItems: 'center', borderTopWidth: 1 },

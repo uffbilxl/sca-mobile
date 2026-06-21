@@ -70,3 +70,17 @@ export interface SCAOpportunity {
   contactEmail?: string
   order: number
 }
+
+export interface Resource {
+  id: string
+  title: string
+  description: string
+  fileUrl: string
+}
+
+export interface ResourceCategory {
+  id: string
+  label: string
+  icon: string
+  resources: Resource[]
+}

@@ -54,9 +54,9 @@ export default function AnimatedBackground() {
 
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
-      <Orb color={`#3b82f6${a}`} size={300} startX={-80} startY={-60} endX={10}  endY={40}  duration={14000} />
+      <Orb color={`#c8b89a${a}`} size={300} startX={-80} startY={-60} endX={10}  endY={40}  duration={14000} />
       <Orb color={`#3fb68b${a}`} size={240} startX={160} startY={320} endX={110} endY={400} duration={11500} />
-      <Orb color={`#6366f1${a}`} size={200} startX={40}  startY={580} endX={90}  endY={500} duration={9800}  />
+      <Orb color={`#a89070${a}`} size={200} startX={40}  startY={580} endX={90}  endY={500} duration={9800}  />
     </View>
   )
 }

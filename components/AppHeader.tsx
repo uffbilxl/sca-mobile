@@ -39,10 +39,9 @@ export default function AppHeader({ variant = 'brand', title, onSearchPress, onF
         </TouchableOpacity>
       ) : variant === 'brand' ? (
         <View style={styles.brand}>
-          <View style={[styles.logoBox, { backgroundColor: '#0b1120' }]}>
-            <Text style={styles.logoText}>S</Text>
+          <View style={[styles.logoBox, { backgroundColor: c.textPrimary }]}>
+            <Text style={[styles.logoText, { color: c.bgPage }]}>SCA</Text>
           </View>
-          <Text style={[styles.wordmark, { color: c.textPrimary }]}>BCUSCA</Text>
         </View>
       ) : (
         <Text style={[styles.screenTitle, { color: c.textPrimary }]}>{title}</Text>
@@ -121,13 +120,13 @@ const styles = StyleSheet.create({
 
   brand: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   logoBox: {
-    width: 28,
-    height: 28,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
     borderRadius: 7,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  logoText: { color: '#fff', fontSize: 14, fontFamily: 'Geist-Bold' },
+  logoText: { fontSize: 13, fontFamily: 'Geist-Bold', letterSpacing: 0.5 },
   wordmark: { fontSize: 15, fontFamily: 'Geist-Bold', letterSpacing: -0.3 },
   screenTitle: { fontSize: 18, fontFamily: 'Geist-Bold', letterSpacing: -0.4 },
 

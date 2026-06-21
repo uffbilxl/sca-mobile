@@ -1,4 +1,4 @@
-import type { Opportunity, SCAEvent } from './types'
+import type { Opportunity, SCAEvent, ResourceCategory } from './types'
 
 const API = 'https://bcusca.org/api'
 const TIMEOUT_MS = 10000
@@ -85,5 +85,19 @@ export async function fetchEvents(): Promise<FetchResult<SCAEvent>> {
     const msg = err?.name === 'AbortError' ? 'Request timed out' : (err?.message ?? 'Network error')
     console.warn('[bcusca/api] fetchEvents failed:', msg)
     return { data: STATIC_EVENTS, live: false, error: msg }
+  }
+}
+
+export async function fetchResources(): Promise<FetchResult<ResourceCategory>> {
+  try {
+    const res = await fetchWithTimeout(`${API}/resources`)
+    if (!res.ok) throw new Error(`Server returned ${res.status}`)
+    const raw: any[] = await res.json()
+    if (!Array.isArray(raw)) throw new Error('Unexpected response shape')
+    return { data: raw, live: true, error: null }
+  } catch (err: any) {
+    const msg = err?.name === 'AbortError' ? 'Request timed out' : (err?.message ?? 'Network error')
+    console.warn('[bcusca/api] fetchResources failed:', msg)
+    return { data: [], live: false, error: msg }
   }
 }
